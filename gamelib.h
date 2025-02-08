@@ -69,7 +69,7 @@ struct gameConfig {};
 
 //Funzions
 
-int getRoomCount(struct Stanza* first);
+int getRoomCount(struct Stanza** mappa);
 
 void impostaGioco(struct Stanza* first, struct Stanza* last);
 void gioca();

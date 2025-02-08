@@ -39,8 +39,9 @@ static void inserisciStanza(struct Stanza* firstRoom, struct Stanza* lastRooom) 
     
 }
 
-static void cancellaStanza() {
+static void cancellaStanza(struct Stanza* lastRoom) {
     printf("cancellaStanza called.\n");
+
 }
 
 static void stampaStanze(struct Stanza* firstRoom) {
@@ -100,10 +101,10 @@ void impostaGioco(struct Stanza* firstRoom, struct Stanza* lastRoom) {
         if (scanf("%d", &temp) == 1) {
         switch (temp) {
             case 1:
-                inserisciStanza(firstRoom, lastRoom); //TODO
+                inserisciStanza(firstRoom, lastRoom); //TODO 
                 break;
             case 2: 
-                cancellaStanza();
+                cancellaStanza(lastRoom);
                 break;
             case 3: 
                 stampaStanze(firstRoom);
@@ -246,6 +247,7 @@ void stampaStanza(struct Stanza* room, int viewAll) {
     } else printRoomType(room->stanzaSopra);
 
 
+
     printf("Porta sotto: ");
     if(room->stanzaSotto == NULL) {
         printf("Chiusa\n");
@@ -254,39 +256,18 @@ void stampaStanza(struct Stanza* room, int viewAll) {
     return;
 }
 
-int getRoomCount(struct Stanza* inizio) {
-    struct Stanza** listOfRooms = (struct Stanza**)malloc(__SIZEOF_POINTER__* 16);
-    int counter = 0;
-    int* counter_ptr = &counter;
-    
-    while (1) {
-        // troppe stanze
-        if (*counter_ptr > 15) {
-            return -1;
-        }
-
-        // trova pirulo
-        struct Stanza* currentRoom = (*listOfRooms + *counter_ptr);
-        if (currentRoom == NULL) {
-            printf("Conta_Stanze chiamata: %d stanze\n", *counter_ptr);
-            return *counter_ptr;
-        }
-        if (currentRoom-> stanzaDx != NULL && currentRoom-> stanzaDx != (currentRoom - 1)-> stanzaSx ) {
-            currentRoom = currentRoom->stanzaDx;
-        } else if (currentRoom-> stanzaSx != NULL && currentRoom-> stanzaSx != (currentRoom - 1)-> stanzaDx ) {
-            currentRoom = currentRoom->stanzaSx;        
-        } else if (currentRoom-> stanzaSotto != NULL && currentRoom-> stanzaSotto != (currentRoom - 1)-> stanzaSopra ) {
-            currentRoom = currentRoom->stanzaSopra;
-        } else if (currentRoom-> stanzaSopra != NULL && currentRoom-> stanzaSopra != (currentRoom - 1)-> stanzaSotto ) {
-            currentRoom = currentRoom->stanzaSotto;
+int getRoomCount(struct Stanza** mappa) {
+    int temp;
+    for (int i = 0; i < 15; i++) {
+        if ((mappa + i) == NULL) {
+            break;
         } else {
-            currentRoom == NULL;
+            temp++;
         }
-
-        *counter_ptr++;
     }
+    return temp;
 }
-
+    
 // external save/load
 
 void Debug(struct Stanza* last) {
