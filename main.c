@@ -11,6 +11,9 @@ int main( ) {
 
     //allocazione memoria
     struct Stanza** mappa = (struct Stanza**)malloc(__SIZEOF_POINTER__* 15);
+    for(int i = 1; i<=15; i++) {
+        *(mappa - 1 + i) = NULL;
+    }
 
     struct Giocatore** giocatori = (struct Giocatore**)malloc(__SIZEOF_POINTER__*4);
 

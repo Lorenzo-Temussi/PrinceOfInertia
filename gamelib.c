@@ -12,37 +12,83 @@
 
 
 // #regione Imposta 
+    static struct Stanza* creaStanza (
+            struct Stanza* sx, struct Stanza* dx, struct Stanza* uw, struct Stanza* dw,
+            int tipoStanza, int tipoTrabocchetto, int tipoTesoro) {
+
+        struct Stanza* temp = (struct Stanza*)malloc(sizeof(struct Stanza));
+        
+        temp->stanzaSx = sx;
+        temp->stanzaDx = dx;
+        temp->stanzaSopra = uw;
+        temp->stanzaSotto = dw;
+        
+        temp->tipoStanza = tipoStanza;
+        temp->tipoTrabocchetto = tipoTrabocchetto;
+        temp->tipoTesoro = tipoTesoro;
+
+        return temp;
+    }
 
     static void inserisciStanza(struct Stanza** mappa) {
-            int selectDir = 0;
-            struct Stanza* lastRoom = *(mappa + getRoomCount(mappa)); 
-        do {
-            printf("inserisciStanza called.\n");
-            printf("Che direzione vuoi andare?"); 
-            if (lastRoom->stanzaSx == NULL) printf(" 1) Sinistra");
-            if (lastRoom->stanzaDx == NULL) printf(" 2) Destra");
-            if (lastRoom->stanzaSopra == NULL) printf(" 3) Sopra");
-            if (lastRoom->stanzaSotto == NULL) printf(" 4) Sotto");
-            printf(" 5) Annulla modifiche e esci");
+        // pick doors
+        struct Stanza* porte [4] = {NULL, NULL, NULL, NULL}; 
+        // pick verythign else
+        int contenuti [] = {0, 0, 0};
 
-            struct Stanza* temp = (struct Stanza*)malloc(sizeof(struct Stanza));
-            
-            
-            if (scanf("%d", &selectDir) == 1) {
-                switch (selectDir) {
-                    case 1:
-                        break;
-                    //TODO
-                }
+        while(1) { // selezione stanza
+            printf("Inserisci tipo stanza:\n"
+            "1) CORRIDOIO\n2) SCALA\n3) SALA BANCHETTO\n4) MAGAZZINO\n"
+            "5) POSTAZIONE DI GUARDIA\n 6) PRIGIONE\n 7) ARMERIA\n 8) MOSCHEA\n"
+            "9) TORRE\n 0) BAGNI\n");
+
+            if ((scanf("%d", &contenuti[0]) == 1) && contenuti[0] >= 0 && contenuti[0] <= 9) {
+                break;
+            } else {
+                printf("Input non valido.\n");
+                while (getchar() != '\n');
+                continue;
+            } 
+        }
+
+        while(1) { // selezione trabocchetto
+            printf("Inserisci tipo trabocchetto:\n"
+            "1) PIANOFORTE\n2) LAME\n3) BANANA\n4) BURRONE\n 0) NESSUNO\n");
+
+            if ((scanf("%d", &contenuti[1]) == 1) && contenuti[1] >= 0 && contenuti[1] <= 4) {
+                break;
             } else {
                 printf("Input is invalid.\n");
                 while (getchar() != '\n');
+                continue;
             } 
-        } while (!(selectDir >= 1 && selectDir <= 4));
+        }
+
+        while(1) { // selezione tesoro
+            printf("Inserisci tipo tesoro:\n"
+            "1) VELENO\n2) GUARIGIONE\n3) AUMENTA_HP\n4) SPADA_TAGLIENTE\n"
+            "5) SCUDO\n0) NESSUNO\n");
+
+            if ((scanf("%d", &contenuti[2]) == 1) && contenuti[2] >= 0 && contenuti[2] <= 5) {
+                break;
+            } else {
+                printf("Input is invalid.\n");
+                while (getchar() != '\n');
+                continue;
+            } 
+        }
+
+        struct Stanza* nuovaStanza = creaStanza(porte[0], porte[1], porte[2], porte[3], contenuti[0], contenuti[1], contenuti[2]);
         
-        return;
-        
+
+        int selectDir = 0;
+        struct Stanza* ultimaStanza = *(mappa + getRoomCount(mappa) -1); 
+        ultimaStanza = nuovaStanza;
+    
+    return;
+    
     }
+
 
     static void cancellaStanza(struct Stanza** mappa) {
         printf("cancellaStanza called.\n");
@@ -312,7 +358,7 @@ void stampaStanza(struct Stanza* room, int viewAll) {
 int getRoomCount(struct Stanza** mappa) { //COMPLETE
     int temp = 0;
     for (int i = 0; i < 15; i++) {
-        if ((mappa + i) == NULL) {
+        if (*(mappa + i) == NULL) {
             break;
         } else {
             temp++;
