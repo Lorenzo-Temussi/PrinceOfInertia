@@ -9,10 +9,13 @@
 
 int main( ) {
 
+    //allocazione memoria
     struct Stanza** mappa = (struct Stanza**)malloc(__SIZEOF_POINTER__* 15);
+
+    struct Giocatore** giocatori = (struct Giocatore**)malloc(__SIZEOF_POINTER__*4);
+
+    struct Giocatore* giocatore_corrente = NULL;
     
-    struct Stanza* firstRoom = NULL;
-    struct Stanza* lastRoom = NULL;
 
     printf("%d", getRoomCount(mappa));
 
@@ -24,7 +27,7 @@ int main( ) {
         if (scanf("%d", &state) == 1) {
             switch(state) {
             case 1:
-                impostaGioco(firstRoom, lastRoom); //inputs firstRoom, lastRoom -> ()
+                impostaGioco(mappa); //inputs firstRoom, lastRoom -> ()
                 break;
             case 2:
                 gioca(); //inputs firstRoom, lastRoom -> ()

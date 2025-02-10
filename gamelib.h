@@ -71,7 +71,7 @@ struct gameConfig {};
 
 int getRoomCount(struct Stanza** mappa);
 
-void impostaGioco(struct Stanza* first, struct Stanza* last);
+void impostaGioco(struct Stanza** mappa);
 void gioca();
 void crediti();
 void terminaGioco();

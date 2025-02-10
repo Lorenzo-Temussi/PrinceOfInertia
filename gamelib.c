@@ -9,69 +9,112 @@
 
 // Funzioni statiche
 
-static void inserisciStanza(struct Stanza* firstRoom, struct Stanza* lastRooom) {
-        int selectDir = 0;
-    do {
-        printf("inserisciStanza called.\n");
-        printf("Che direzione vuoi andare?"); 
-        if (lastRooom->stanzaSx == NULL) printf(" 1) Sinistra");
-        if (lastRooom->stanzaDx == NULL) printf(" 2) Destra");
-        if (lastRooom->stanzaSopra == NULL) printf(" 3) Sopra");
-        if (lastRooom->stanzaSotto == NULL) printf(" 4) Sotto");
-        printf(" 5) Annulla modifiche e esci");
 
-        struct Stanza* temp = (struct Stanza*)malloc(sizeof(struct Stanza));
+
+// #regione Imposta 
+
+    static void inserisciStanza(struct Stanza** mappa) {
+            int selectDir = 0;
+            struct Stanza* lastRoom = *(mappa + getRoomCount(mappa)); 
+        do {
+            printf("inserisciStanza called.\n");
+            printf("Che direzione vuoi andare?"); 
+            if (lastRoom->stanzaSx == NULL) printf(" 1) Sinistra");
+            if (lastRoom->stanzaDx == NULL) printf(" 2) Destra");
+            if (lastRoom->stanzaSopra == NULL) printf(" 3) Sopra");
+            if (lastRoom->stanzaSotto == NULL) printf(" 4) Sotto");
+            printf(" 5) Annulla modifiche e esci");
+
+            struct Stanza* temp = (struct Stanza*)malloc(sizeof(struct Stanza));
+            
+            
+            if (scanf("%d", &selectDir) == 1) {
+                switch (selectDir) {
+                    case 1:
+                        break;
+                    //TODO
+                }
+            } else {
+                printf("Input is invalid.\n");
+                while (getchar() != '\n');
+            } 
+        } while (!(selectDir >= 1 && selectDir <= 4));
         
+        return;
         
-        if (scanf("%d", &selectDir) == 1) {
-            switch (selectDir) {
-                case 1:
-
-
-            }
-        } else {
-            printf("Input is invalid.\n");
-            while (getchar() != '\n');
-        } 
-    } while (!(selectDir >= 1 && selectDir <= 4));
-    
-    return;
-    
-}
-
-static void cancellaStanza(struct Stanza* lastRoom) {
-    printf("cancellaStanza called.\n");
-
-}
-
-static void stampaStanze(struct Stanza* firstRoom) {
-    printf("stampaStanze called.\n");
-    int numStanze = getRoomCount(firstRoom);
-    for(int i = 0; i < numStanze; i++) {
-        stampaStanza(firstRoom + i, 1);
     }
-}
 
-static void generaRandom() {
-    printf("generaRandom called.\n");
-}
+    static void cancellaStanza(struct Stanza** mappa) {
+        printf("cancellaStanza called.\n");
 
-static void chiudiMappa() {
-    printf("chiudiMappa called.\n");
-    
-}
+    }
+
+    static void stampaStanze(struct Stanza** mappa) {
+        printf("stampaStanze called.\n");
+        int numStanze = getRoomCount(mappa);
+        for(int i = 0; i < numStanze; i++) {
+            stampaStanza(*(mappa + i), 1);
+        }
+    }
+
+    static void generaRandom(struct Stanza** mappa) {
+        printf("generaRandom called.\n");
+    }
+
+    static void chiudiMappa() {
+        printf("chiudiMappa called.\n");
+        
+    }
+
+// #endregion 
+
 
 static void avanza() {
     printf("avanza called.\n");
 }
 
-static void combatti() {
-    printf("combatti called.\n");   
-}
 
-static void scappa() {
-    printf("scappa called.\n");
-}
+// #region Combattimento 
+
+
+    static void vinci() {
+        printf("vinci called.\n");
+    }
+
+    static void scappa() {
+        printf("scappa called.\n");
+    }    
+
+    static void combatti() {
+        printf("combatti called.\n"); 
+        while(1) {
+            int choice = 0;
+            printf("scegli un'azione pisé:\n1) Lotta!\n2) Vinci\n3) Scappa\n");
+            if (scanf("%d", &choice) == 1) { 
+                switch (choice) {
+                    case 1: 
+                        printf("Lotti per un turno intero!\n");
+                        break;
+                    case 2: 
+                        printf("Sconfiggi l'avversario!\n");
+                        vinci();
+                        break;
+                    case 3: 
+                        printf("Riesci a fuggire per il rotto della cuffia...\n");
+                        scappa();
+                        break;
+                    default: 
+                        printf("Opzione non valida.\n");
+                        break;
+                }
+
+            }
+        }  
+    }
+
+
+// #endregion
+
 
 static void stampaGiocatori() {
     printf("stampaGiocatori called.\n");
@@ -93,7 +136,7 @@ static void passaTurno() {
     printf("passaTurno called.\n");
 }
 
-void impostaGioco(struct Stanza* firstRoom, struct Stanza* lastRoom) {
+void impostaGioco(struct Stanza** mappa) {
     printf("impostaGioco called.\n");
     do {
         int temp = 0;
@@ -101,16 +144,16 @@ void impostaGioco(struct Stanza* firstRoom, struct Stanza* lastRoom) {
         if (scanf("%d", &temp) == 1) {
         switch (temp) {
             case 1:
-                inserisciStanza(firstRoom, lastRoom); //TODO 
+                inserisciStanza(mappa); //TODO 
                 break;
             case 2: 
-                cancellaStanza(lastRoom);
+                cancellaStanza(mappa);
                 break;
             case 3: 
-                stampaStanze(firstRoom);
+                stampaStanze(mappa);
                 break;
             case 4: 
-                generaRandom();
+                generaRandom(mappa);
                 break;
             case 5:
                 chiudiMappa();
@@ -129,31 +172,35 @@ void impostaGioco(struct Stanza* firstRoom, struct Stanza* lastRoom) {
     while (1);
 }
 
-void gioca() {
-    int playerNum = 1;
+// #region Gioca
 
-    // selezione giocatori
-    
-    do {
-        printf("Quanti giocatori ci sono? Max 4.\n");
-        if (scanf("%d", &playerNum) == 1) {
-            if (playerNum <= 4 && playerNum >= 1) {
-                printf("Preparo il gioco per %d giocatori.\n", playerNum);
+    void gioca() {
+        int playerNum = 1;
+
+        // selezione giocatori
+        
+        do {
+            printf("Quanti giocatori ci sono? Max 4.\n");
+            if (scanf("%d", &playerNum) == 1) {
+                if (playerNum <= 4 && playerNum >= 1) {
+                    printf("Preparo il gioco per %d giocatori.\n", playerNum);
+                } else {
+                    printf("Questa versione del gioco supporta un massimo di 4 giocatori.\n");       
+                }
+                
             } else {
-                printf("Questa versione del gioco supporta un massimo di 4 giocatori.\n");       
-            }
-            
-        } else {
-            printf("Input non valido.\n");
-        }  
-        while (getchar() != '\n');
-    } while(!(playerNum <= 4 && playerNum >= 1));
+                printf("Input non valido.\n");
+            }  
+            while (getchar() != '\n');
+        } while(!(playerNum <= 4 && playerNum >= 1));
 
-    //selezione classi
+        //selezione classi
 
 
-     
-} 
+        
+    } 
+
+// #endregion
 
 void crediti() {
     printf("crediti called.\n");
@@ -162,6 +209,15 @@ void crediti() {
 void terminaGioco() {
     printf("terminaGioco called.\n");
     exit(0);
+}
+
+
+struct Stanza* getFirstRoom (struct Stanza** mappa) {
+    return *mappa;
+}
+
+struct Stanza* getlastRoom (struct Stanza** mappa) {
+    return *(mappa + getRoomCount(mappa) - 1);
 }
 
 //Subroutines 
@@ -240,13 +296,10 @@ void stampaStanza(struct Stanza* room, int viewAll) {
         printf("Chiusa\n");
     } else printRoomType(room->stanzaDx);
 
-
     printf("Porta sopra: ");
     if(room->stanzaSopra == NULL) {
         printf("Chiusa\n");
     } else printRoomType(room->stanzaSopra);
-
-
 
     printf("Porta sotto: ");
     if(room->stanzaSotto == NULL) {
@@ -256,8 +309,8 @@ void stampaStanza(struct Stanza* room, int viewAll) {
     return;
 }
 
-int getRoomCount(struct Stanza** mappa) {
-    int temp;
+int getRoomCount(struct Stanza** mappa) { //COMPLETE
+    int temp = 0;
     for (int i = 0; i < 15; i++) {
         if ((mappa + i) == NULL) {
             break;
@@ -285,7 +338,7 @@ void Debug(struct Stanza* last) {
 
     last = newRoom;
 }
-
+/*
 void writeToFile(const char *filename, struct Stanza *s) {
     FILE *file = fopen(filename, "w");
     if (file == NULL) {
@@ -302,7 +355,7 @@ void writeToFile(const char *filename, struct Stanza *s) {
     fprintf(file, "%p\n", s->stanzaSopra);
 
     fclose(file);
-}
+}*/
 
 void printRoomType(struct Stanza* stanza) {
     switch(stanza->tipoStanza) {
