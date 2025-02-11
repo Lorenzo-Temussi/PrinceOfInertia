@@ -48,10 +48,7 @@ struct Stanza {
     enum tipo_trabocchetto tipoTrabocchetto;
     enum tipo_tesoro tipoTesoro;
 
-    struct Stanza* stanzaSx;
-    struct Stanza* stanzaDx;
-    struct Stanza* stanzaSopra;
-    struct Stanza* stanzaSotto;
+    struct Stanza* porte [4]; //Ordine: dx, uw, sx, dw (come la circ. goniometrica)
 };
 
 struct Giocatore{

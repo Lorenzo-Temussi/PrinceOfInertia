@@ -13,15 +13,15 @@
 
 // #regione Imposta 
     static struct Stanza* creaStanza (
-            struct Stanza* sx, struct Stanza* dx, struct Stanza* uw, struct Stanza* dw,
+            struct Stanza* dx, struct Stanza* uw, struct Stanza* sx, struct Stanza* dw,
             int tipoStanza, int tipoTrabocchetto, int tipoTesoro) {
 
         struct Stanza* temp = (struct Stanza*)malloc(sizeof(struct Stanza));
         
-        temp->stanzaSx = sx;
-        temp->stanzaDx = dx;
-        temp->stanzaSopra = uw;
-        temp->stanzaSotto = dw;
+        temp->porte[0] = dx;
+        temp->porte[1] = uw;
+        temp->porte[2] = sx;
+        temp->porte[3] = dw;
         
         temp->tipoStanza = tipoStanza;
         temp->tipoTrabocchetto = tipoTrabocchetto;
@@ -31,8 +31,42 @@
     }
 
     static void inserisciStanza(struct Stanza** mappa) {
+        struct Stanza* ultimaStanza = NULL;
+        int numStanze = getRoomCount(mappa); //caso prima stanza
+
         // pick doors
         struct Stanza* porte [4] = {NULL, NULL, NULL, NULL}; 
+        
+        int porta = 5;
+
+        while(1) { // selezione porta
+        
+            printf("Da quale porta si accede alla stanza?:\n"
+            "0) DESTRA\n1) AVANTI\n2) SINISTRA\n3) INDIETRO\n");
+
+            if ((scanf("%d", &porta) == 1) && porta >= 0 && porta <= 4) {
+                // do nun
+            } else {
+                printf("Input non valido.\n");
+                while (getchar() != '\n');
+                continue;
+            } 
+
+            if (numStanze) {
+
+                ultimaStanza = *(mappa - 1 + getRoomCount(mappa));
+                if (ultimaStanza->porte[(porta + 2)%4] != NULL) {
+                    printf("La porta corrispondente è già in uso.\n");
+                    continue;
+                }
+
+                porte[porta] = ultimaStanza;
+            }
+            break;
+
+        }
+
+
         // pick verythign else
         int contenuti [] = {0, 0, 0};
 
@@ -80,11 +114,12 @@
 
         struct Stanza* nuovaStanza = creaStanza(porte[0], porte[1], porte[2], porte[3], contenuti[0], contenuti[1], contenuti[2]);
         
+        if(numStanze) {
+            ultimaStanza->porte[(porta+2)%4] = nuovaStanza;
+        }
 
-        int selectDir = 0;
-        struct Stanza* ultimaStanza = *(mappa + getRoomCount(mappa) -1); 
-        ultimaStanza = nuovaStanza;
-    
+        mappa[numStanze] = nuovaStanza;
+
     return;
     
     }
@@ -332,25 +367,26 @@ void stampaStanza(struct Stanza* room, int viewAll) {
         }
     }
 
-    printf("Porta sinistra: ");
-    if(room->stanzaSx == NULL) {
-        printf("Chiusa\n");
-    } else printRoomType(room->stanzaSx);
 
     printf("Porta destra: ");
-    if(room->stanzaDx == NULL) {
+    if(room->porte[0] == NULL) {
         printf("Chiusa\n");
-    } else printRoomType(room->stanzaDx);
+    } else printRoomType(room->porte[0]);
 
     printf("Porta sopra: ");
-    if(room->stanzaSopra == NULL) {
+    if(room->porte[1] == NULL) {
         printf("Chiusa\n");
-    } else printRoomType(room->stanzaSopra);
+    } else printRoomType(room->porte[1]);
+
+    printf("Porta sinistra: ");
+    if(room->porte[2] == NULL) {
+        printf("Chiusa\n");
+    } else printRoomType(room->porte[2]);
 
     printf("Porta sotto: ");
-    if(room->stanzaSotto == NULL) {
+    if(room->porte[3] == NULL) {
         printf("Chiusa\n");
-    } else printRoomType(room->stanzaSotto);
+    } else printRoomType(room->porte[3]);
 
     return;
 }
@@ -370,19 +406,7 @@ int getRoomCount(struct Stanza** mappa) { //COMPLETE
 // external save/load
 
 void Debug(struct Stanza* last) {
-    last->stanzaDx = (struct Stanza*)malloc(sizeof(struct Stanza*));
-    struct Stanza* newRoom = last->stanzaDx;
-
-    newRoom->tipoStanza = BAGNI;
-    newRoom->tipoTrabocchetto = LAME;
-    newRoom->tipoTesoro = SCUDO;
-
-    newRoom->stanzaSx = last;
-    newRoom->stanzaDx = NULL;
-    newRoom->stanzaSopra = NULL;
-    newRoom->stanzaSotto = NULL;
-
-    last = newRoom;
+    
 }
 /*
 void writeToFile(const char *filename, struct Stanza *s) {
