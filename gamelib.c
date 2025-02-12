@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 // Definizioni delle funzioni in gamelib.c.
 // Piu altre funzioni di supporto.
 // Le funzioni richiamabili in main.c non devono essere static.
@@ -13,7 +14,7 @@
 
 // #regione Imposta 
     static struct Stanza* creaStanza (
-            struct Stanza* dx, struct Stanza* uw, struct Stanza* sx, struct Stanza* dw,
+            struct Stanza** mappa, struct Stanza* dx, struct Stanza* uw, struct Stanza* sx, struct Stanza* dw,
             int tipoStanza, int tipoTrabocchetto, int tipoTesoro) {
 
         struct Stanza* temp = (struct Stanza*)malloc(sizeof(struct Stanza));
@@ -27,12 +28,29 @@
         temp->tipoTrabocchetto = tipoTrabocchetto;
         temp->tipoTesoro = tipoTesoro;
 
+        int numStanze = getRoomCount(mappa);
+        struct Stanza* ultimaStanza = *(mappa - 1 + numStanze);
+
+        if(numStanze) {
+            for (int i = 0; i < 4; i++){
+                if(temp->porte[i] == ultimaStanza) {
+                    ultimaStanza->porte[(i+2)%4] = temp;
+                }
+            }
+            
+        }
+
+        mappa[numStanze] = temp;
+
         return temp;
     }
 
     static void inserisciStanza(struct Stanza** mappa) {
         struct Stanza* ultimaStanza = NULL;
-        int numStanze = getRoomCount(mappa); //caso prima stanza
+        int numStanze = getRoomCount(mappa); 
+        if (numStanze >= 15) {
+            return;
+        }
 
         // pick doors
         struct Stanza* porte [4] = {NULL, NULL, NULL, NULL}; 
@@ -42,7 +60,7 @@
         while(1) { // selezione porta
         
             printf("Da quale porta si accede alla stanza?:\n"
-            "0) DESTRA\n1) AVANTI\n2) SINISTRA\n3) INDIETRO\n");
+            " 0) DESTRA\n 1) AVANTI\n 2) SINISTRA\n 3) INDIETRO\n");
 
             if ((scanf("%d", &porta) == 1) && porta >= 0 && porta <= 4) {
                 // do nun
@@ -72,9 +90,9 @@
 
         while(1) { // selezione stanza
             printf("Inserisci tipo stanza:\n"
-            "1) CORRIDOIO\n2) SCALA\n3) SALA BANCHETTO\n4) MAGAZZINO\n"
-            "5) POSTAZIONE DI GUARDIA\n 6) PRIGIONE\n 7) ARMERIA\n 8) MOSCHEA\n"
-            "9) TORRE\n 0) BAGNI\n");
+            " 0) CORRIDOIO\n 1) SCALA\n 2) SALA BANCHETTO\n 3) MAGAZZINO"
+            "\n 4) POSTAZIONE DI GUARDIA\n 5) PRIGIONE\n 6) ARMERIA\n 7) MOSCHEA\n"
+            " 8) TORRE\n 9) BAGNI\n");
 
             if ((scanf("%d", &contenuti[0]) == 1) && contenuti[0] >= 0 && contenuti[0] <= 9) {
                 break;
@@ -87,7 +105,7 @@
 
         while(1) { // selezione trabocchetto
             printf("Inserisci tipo trabocchetto:\n"
-            "1) PIANOFORTE\n2) LAME\n3) BANANA\n4) BURRONE\n 0) NESSUNO\n");
+            " 1) PIANOFORTE\n 2) LAME\n 3) BANANA\n 4) BURRONE\n 0) NESSUNO\n");
 
             if ((scanf("%d", &contenuti[1]) == 1) && contenuti[1] >= 0 && contenuti[1] <= 4) {
                 break;
@@ -100,8 +118,8 @@
 
         while(1) { // selezione tesoro
             printf("Inserisci tipo tesoro:\n"
-            "1) VELENO\n2) GUARIGIONE\n3) AUMENTA_HP\n4) SPADA_TAGLIENTE\n"
-            "5) SCUDO\n0) NESSUNO\n");
+            " 1) VELENO\n 2) GUARIGIONE\n 3) AUMENTA_HP\n 4) SPADA_TAGLIENTE\n"
+            " 5) SCUDO\n 0) NESSUNO\n");
 
             if ((scanf("%d", &contenuti[2]) == 1) && contenuti[2] >= 0 && contenuti[2] <= 5) {
                 break;
@@ -112,21 +130,58 @@
             } 
         }
 
-        struct Stanza* nuovaStanza = creaStanza(porte[0], porte[1], porte[2], porte[3], contenuti[0], contenuti[1], contenuti[2]);
+        struct Stanza* nuovaStanza = creaStanza(mappa, porte[0], porte[1], porte[2], porte[3], contenuti[0], contenuti[1], contenuti[2]);
         
-        if(numStanze) {
-            ultimaStanza->porte[(porta+2)%4] = nuovaStanza;
-        }
-
-        mappa[numStanze] = nuovaStanza;
+        
 
     return;
     
     }
 
-
     static void cancellaStanza(struct Stanza** mappa) {
-        printf("cancellaStanza called.\n");
+        if (getRoomCount(mappa) > 1) {
+                struct Stanza* penultimaStanza = *(mappa - 2 + getRoomCount(mappa));
+                struct Stanza* ultimaStanza = *(mappa -1 + getRoomCount(mappa));
+                for (int i = 0; i < 4; i++) {
+                    if (penultimaStanza->porte[i] == ultimaStanza) {
+                        penultimaStanza->porte[i] = NULL;
+                    }
+                }
+            
+            }
+    }
+
+    static void cancellaStanzaSelect(struct Stanza** mappa) {
+        if (getRoomCount(mappa) == 0) {
+            printf("Non ci sono stanze su questa mappa.\n");
+            return;
+        }
+
+        printf("Ultima stanza creata:\n\n");
+        struct Stanza* ultimaStanza = *(mappa - 1 + getRoomCount(mappa));
+        stampaStanza(ultimaStanza, 1);
+        printf("Vuoi davvero cancellare questa stanza?\n0) Annulla\n1) Conferma\n");
+        int temp = 0;
+
+        if ((scanf("%d", &temp) == 1) && temp <= 1 && temp >= 0) {
+            if(temp == 0) {
+                printf("Operazione annullata.\n");
+                return;
+            }
+
+
+            cancellaStanza(mappa);
+
+            *(mappa - 1 + getRoomCount(mappa)) = NULL;
+            free(ultimaStanza);
+
+            
+            printf("Cancellazione completa!\n");
+            
+            } else {
+                printf("Input non valido.\n");
+                while (getchar() != '\n');
+            } 
 
     }
 
@@ -140,11 +195,47 @@
 
     static void generaRandom(struct Stanza** mappa) {
         printf("generaRandom called.\n");
+
+        //Cancella tutte
+        int temp = getRoomCount(mappa);
+        for (int i = 0; i < temp; i++) {
+            cancellaStanza(mappa);
+        }
+
+        //Genera Ex Novo
+        for (int i = 0; i < 15; i++) {
+            
+
+            struct Stanza* porte[4] = {NULL, NULL, NULL, NULL};
+            if(getRoomCount(mappa)) {
+                porte[0] = *(mappa -1 + getRoomCount(mappa));
+            }
+
+            for (int j = 0; j < 4; j++) { //roll porta
+
+            }
+
+            int tipoStanza = 0; //roll stanza
+
+            int tipoTrabocchetto = 0; //roll trabocchetto
+
+            int tipoTesoro = 0; //roll tesoro
+
+            creaStanza(mappa, porte[0], porte[1], porte[2], porte[3], tipoStanza, tipoTrabocchetto, tipoTesoro);
+            printf("iterato\n");
+        }
+
+        printf("Se riesci a leggere questo, non hai segfaultato\n");
     }
 
-    static void chiudiMappa() {
-        printf("chiudiMappa called.\n");
-        
+    static int chiudiMappa(struct Stanza** mappa) {
+        int temp = getRoomCount(mappa);
+        if (temp != 15) {
+            printf("La mappa ha %d stanze. Puoi salvare solo mappe con 15 stanze esatte.\n", temp);
+            return 0;
+        }
+
+        return 1;
     }
 
 // #endregion 
@@ -225,20 +316,19 @@ void impostaGioco(struct Stanza** mappa) {
         if (scanf("%d", &temp) == 1) {
         switch (temp) {
             case 1:
-                inserisciStanza(mappa); //TODO 
+                inserisciStanza(mappa); //DONE 
                 break;
             case 2: 
-                cancellaStanza(mappa);
+                cancellaStanzaSelect(mappa); //DONE
                 break;
             case 3: 
-                stampaStanze(mappa);
+                stampaStanze(mappa); //DONE
                 break;
             case 4: 
-                generaRandom(mappa);
+                generaRandom(mappa); //IN PROGRESS
                 break;
             case 5:
-                chiudiMappa();
-                return;
+                if (chiudiMappa(mappa)) {return;} //DONE
                 break;
             default:
                 break;
@@ -305,13 +395,16 @@ struct Stanza* getlastRoom (struct Stanza** mappa) {
 void stampaStanza(struct Stanza* room, int viewAll) {
 
     if(room == NULL) {
-        printf("Nessuna stanza selezionata.");
+        printf(" Nessuna stanza selezionata.");
     }
 
-    printf("Tipo stanza: ");
+
+    printf("_______________________________\n");
+    printf(" Tipo stanza: ");
     printRoomType(room);
+    printf("\n\n");
     
-    printf("Tipo trabocchetto: ");
+    printf(" Tipo trabocchetto: ");
     switch(room->tipoTrabocchetto) {
         case NESSUN_TRABOCCHETTO:
             printf("NESSUN_TRABOCCHETTO\n");
@@ -334,8 +427,9 @@ void stampaStanza(struct Stanza* room, int viewAll) {
     }
     
     
+    
     if(viewAll){
-        printf("Tipo tesoro: ");
+        printf(" Tipo tesoro: ");
         switch(room->tipoTesoro) {
             case NESSUN_TESORO:
                 printf("NESSUN_TESORO\n");
@@ -368,25 +462,27 @@ void stampaStanza(struct Stanza* room, int viewAll) {
     }
 
 
-    printf("Porta destra: ");
+    printf(" Porta destra: ");
     if(room->porte[0] == NULL) {
         printf("Chiusa\n");
     } else printRoomType(room->porte[0]);
 
-    printf("Porta sopra: ");
+    printf(" Porta sopra: ");
     if(room->porte[1] == NULL) {
         printf("Chiusa\n");
     } else printRoomType(room->porte[1]);
 
-    printf("Porta sinistra: ");
+    printf(" Porta sinistra: ");
     if(room->porte[2] == NULL) {
         printf("Chiusa\n");
     } else printRoomType(room->porte[2]);
 
-    printf("Porta sotto: ");
+    printf(" Porta sotto: ");
     if(room->porte[3] == NULL) {
         printf("Chiusa\n");
     } else printRoomType(room->porte[3]);
+
+    printf("_______________________________\n");
 
     return;
 }
@@ -436,13 +532,13 @@ void printRoomType(struct Stanza* stanza) {
             printf("SCALA\n");
             break;
         case SALA_BANCHETTO: 
-            printf("SALA_BANCHETTO\n");
+            printf("SALA BANCHETTO\n");
             break;
         case MAGAZZINO: 
             printf("MAGAZZINO\n");
             break;
         case POSTO_GUARDIA: 
-            printf("POSTO_GUARDIA\n");
+            printf("POSTO DI GUARDIA\n");
             break;
         case PRIGIONE: 
             printf("PRIGIONE\n");

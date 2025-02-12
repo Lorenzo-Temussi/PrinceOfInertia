@@ -19,9 +19,6 @@ int main( ) {
 
     struct Giocatore* giocatore_corrente = NULL;
     
-
-    printf("%d", getRoomCount(mappa));
-
     //Debug(lastRoom);
 
     int state = 0;
