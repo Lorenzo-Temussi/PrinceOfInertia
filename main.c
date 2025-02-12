@@ -9,6 +9,9 @@
 
 int main( ) {
 
+    int seed = 0;
+    generaSeed(&seed);
+
     //allocazione memoria
     struct Stanza** mappa = (struct Stanza**)malloc(__SIZEOF_POINTER__* 15);
     for(int i = 1; i<=15; i++) {
@@ -27,13 +30,13 @@ int main( ) {
         if (scanf("%d", &state) == 1) {
             switch(state) {
             case 1:
-                impostaGioco(mappa); //inputs firstRoom, lastRoom -> ()
+                impostaGioco(mappa); //DONE
                 break;
             case 2:
                 gioca(); //inputs firstRoom, lastRoom -> ()
                 break;
             case 3:
-                terminaGioco(); //inputs - -> create savefile ()
+                terminaGioco(); //DONE
                 break;
             case 4: 
                 crediti(); // - -> printf()

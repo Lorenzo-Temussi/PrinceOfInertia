@@ -1,6 +1,7 @@
 #include "gamelib.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 
 // Definizioni delle funzioni in gamelib.c.
@@ -10,7 +11,175 @@
 
 // Funzioni statiche
 
+// #regione Utility
+    void generaSeed(int* seed) {
+        time_t t;
+        srand((unsigned) time(&t));
+        printf("seed is now %d", *seed);
+    }
 
+    void selezionaSeed (int* seed, int input) {
+        *seed = input;
+        printf("seed is now %d", input);
+    }
+
+    int generaRandomStanza() {
+        int tipoStanza = rand() % 10; //roll stanza
+        return tipoStanza;
+    }
+
+    int generaRandomTrabocchetto() {
+                    
+        int tipoTrabocchettoRand = rand() % 100;
+        if (tipoTrabocchettoRand <= 64) {
+            return 0;
+        } else if (tipoTrabocchettoRand <= 74) {
+            return 1;
+        } else if (tipoTrabocchettoRand <= 83) {
+            return 2;
+        } else if (tipoTrabocchettoRand <= 91) {
+            return 3;
+        } else if (tipoTrabocchettoRand <= 99) {
+            return 4;
+        }
+        return 0;
+    }
+
+    int generaRandomTesoro() {
+                    
+        int tipoTesoroRand = rand() % 100;
+        if (tipoTesoroRand <= 19) {
+            return 0;
+        } else if (tipoTesoroRand <= 39) {
+            return 1;
+        } else if (tipoTesoroRand <= 59) {
+            return 2;
+        } else if (tipoTesoroRand <= 74) {
+            return 3;
+        } else if (tipoTesoroRand <= 89) {
+            return 4;
+        } else if (tipoTesoroRand <= 99) {
+            return 5;
+        }
+        return 0;
+    }
+
+    struct Stanza* getFirstRoom (struct Stanza** mappa) {
+        return *mappa;
+    }
+
+    struct Stanza* getlastRoom (struct Stanza** mappa) {
+        return *(mappa + getRoomCount(mappa) - 1);
+    }
+
+
+    void stampaStanza(struct Stanza* room, int viewAll) {
+
+    if(room == NULL) {
+        printf(" Nessuna stanza selezionata.");
+    }
+
+
+    printf("_______________________________\n");
+    printf(" Tipo stanza: ");
+    printRoomType(room);
+    printf("\n\n");
+    
+    printf(" Tipo trabocchetto: ");
+    switch(room->tipoTrabocchetto) {
+        case NESSUN_TRABOCCHETTO:
+            printf("NESSUN_TRABOCCHETTO\n");
+            break;
+        case PIANOFORTE:
+            printf("PIANOFORTE\n");
+            break;
+        case LAME: 
+            printf("LAME\n");
+            break;
+        case CADUTA: 
+            printf("CADUTA\n");
+            break;
+        case BURRONE: 
+            printf("BURRONE\n");
+            break;
+        default: 
+            printf("errore: tipo trabucchino non valido\n");
+            break;
+    }
+    
+    
+    
+    if(viewAll){
+        printf(" Tipo tesoro: ");
+        switch(room->tipoTesoro) {
+            case NESSUN_TESORO:
+                printf("NESSUN_TESORO\n");
+                break;
+            case VELENO:
+                printf("VELENO\n");
+                break;
+            case GUARIGIONE: 
+                printf("GUARIGIONE\n");
+                break;
+            case AUMENTA_HP: 
+                printf("AUMENTA_HP\n");
+                break;
+            case SPADA_TAGLIENTE: 
+                printf("SPADA_TAGLIENTE\n");
+                break;
+            case SCUDO: 
+                printf("SCUDO\n");
+                break;
+            default: 
+                printf("errore: tipo tesoro non valido\n");
+                break;
+        }
+    } else { 
+        if(room->tipoTesoro) {
+            printf("La stanza contiente un tesoro sconosciuto...\n");
+        } else {
+            printf("La stanza non contiente un tesoro...\n");
+        }
+    }
+
+
+    printf(" Porta destra: ");
+    if(room->porte[0] == NULL) {
+        printf("Chiusa\n");
+    } else printRoomType(room->porte[0]);
+
+    printf(" Porta sopra: ");
+    if(room->porte[1] == NULL) {
+        printf("Chiusa\n");
+    } else printRoomType(room->porte[1]);
+
+    printf(" Porta sinistra: ");
+    if(room->porte[2] == NULL) {
+        printf("Chiusa\n");
+    } else printRoomType(room->porte[2]);
+
+    printf(" Porta sotto: ");
+    if(room->porte[3] == NULL) {
+        printf("Chiusa\n");
+    } else printRoomType(room->porte[3]);
+
+    printf("_______________________________\n");
+
+    return;
+}
+
+int getRoomCount(struct Stanza** mappa) { //COMPLETE
+    int temp = 0;
+    for (int i = 0; i < 15; i++) {
+        if (*(mappa + i) == NULL) {
+            break;
+        } else {
+            temp++;
+        }
+    }
+    return temp;
+}
+    
 
 // #regione Imposta 
     static struct Stanza* creaStanza (
@@ -214,12 +383,11 @@
             for (int j = 0; j < 4; j++) { //roll porta
 
             }
+            int tipoStanza = generaRandomStanza();
 
-            int tipoStanza = 0; //roll stanza
-
-            int tipoTrabocchetto = 0; //roll trabocchetto
-
-            int tipoTesoro = 0; //roll tesoro
+            int tipoTrabocchetto = generaRandomTrabocchetto();
+            
+            int tipoTesoro = generaRandomTesoro();
 
             creaStanza(mappa, porte[0], porte[1], porte[2], porte[3], tipoStanza, tipoTrabocchetto, tipoTesoro);
             printf("iterato\n");
@@ -383,122 +551,7 @@ void terminaGioco() {
 }
 
 
-struct Stanza* getFirstRoom (struct Stanza** mappa) {
-    return *mappa;
-}
 
-struct Stanza* getlastRoom (struct Stanza** mappa) {
-    return *(mappa + getRoomCount(mappa) - 1);
-}
-
-//Subroutines 
-void stampaStanza(struct Stanza* room, int viewAll) {
-
-    if(room == NULL) {
-        printf(" Nessuna stanza selezionata.");
-    }
-
-
-    printf("_______________________________\n");
-    printf(" Tipo stanza: ");
-    printRoomType(room);
-    printf("\n\n");
-    
-    printf(" Tipo trabocchetto: ");
-    switch(room->tipoTrabocchetto) {
-        case NESSUN_TRABOCCHETTO:
-            printf("NESSUN_TRABOCCHETTO\n");
-            break;
-        case PIANOFORTE:
-            printf("PIANOFORTE\n");
-            break;
-        case LAME: 
-            printf("LAME\n");
-            break;
-        case CADUTA: 
-            printf("CADUTA\n");
-            break;
-        case BURRONE: 
-            printf("BURRONE\n");
-            break;
-        default: 
-            printf("errore: tipo trabucchino non valido\n");
-            break;
-    }
-    
-    
-    
-    if(viewAll){
-        printf(" Tipo tesoro: ");
-        switch(room->tipoTesoro) {
-            case NESSUN_TESORO:
-                printf("NESSUN_TESORO\n");
-                break;
-            case VELENO:
-                printf("VELENO\n");
-                break;
-            case GUARIGIONE: 
-                printf("GUARIGIONE\n");
-                break;
-            case AUMENTA_HP: 
-                printf("AUMENTA_HP\n");
-                break;
-            case SPADA_TAGLIENTE: 
-                printf("SPADA_TAGLIENTE\n");
-                break;
-            case SCUDO: 
-                printf("SCUDO\n");
-                break;
-            default: 
-                printf("errore: tipo tesoro non valido\n");
-                break;
-        }
-    } else { 
-        if(room->tipoTesoro) {
-            printf("La stanza contiente un tesoro sconosciuto...\n");
-        } else {
-            printf("La stanza non contiente un tesoro...\n");
-        }
-    }
-
-
-    printf(" Porta destra: ");
-    if(room->porte[0] == NULL) {
-        printf("Chiusa\n");
-    } else printRoomType(room->porte[0]);
-
-    printf(" Porta sopra: ");
-    if(room->porte[1] == NULL) {
-        printf("Chiusa\n");
-    } else printRoomType(room->porte[1]);
-
-    printf(" Porta sinistra: ");
-    if(room->porte[2] == NULL) {
-        printf("Chiusa\n");
-    } else printRoomType(room->porte[2]);
-
-    printf(" Porta sotto: ");
-    if(room->porte[3] == NULL) {
-        printf("Chiusa\n");
-    } else printRoomType(room->porte[3]);
-
-    printf("_______________________________\n");
-
-    return;
-}
-
-int getRoomCount(struct Stanza** mappa) { //COMPLETE
-    int temp = 0;
-    for (int i = 0; i < 15; i++) {
-        if (*(mappa + i) == NULL) {
-            break;
-        } else {
-            temp++;
-        }
-    }
-    return temp;
-}
-    
 // external save/load
 
 void Debug(struct Stanza* last) {

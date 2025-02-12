@@ -67,6 +67,7 @@ struct gameConfig {};
 //Funzions
 
 int getRoomCount(struct Stanza** mappa);
+void generaSeed(int* seed);
 
 void impostaGioco(struct Stanza** mappa);
 void gioca();
