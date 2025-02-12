@@ -64,6 +64,11 @@
         return 0;
     }
 
+    int generaRandomPorte(int ultimaPorta) {
+        ultimaPorta = (ultimaPorta + 3 + rand() % 3) %4;
+        return (ultimaPorta);
+    }
+
     struct Stanza* getFirstRoom (struct Stanza** mappa) {
         return *mappa;
     }
@@ -372,22 +377,20 @@ int getRoomCount(struct Stanza** mappa) { //COMPLETE
         }
 
         //Genera Ex Novo
+        int ultimaPorta = rand() %4;
         for (int i = 0; i < 15; i++) {
-            
-
+                    
             struct Stanza* porte[4] = {NULL, NULL, NULL, NULL};
-            if(getRoomCount(mappa)) {
-                porte[0] = *(mappa -1 + getRoomCount(mappa));
-            }
 
-            for (int j = 0; j < 4; j++) { //roll porta
-
-            }
             int tipoStanza = generaRandomStanza();
 
             int tipoTrabocchetto = generaRandomTrabocchetto();
             
             int tipoTesoro = generaRandomTesoro();
+
+            ultimaPorta = generaRandomPorte(ultimaPorta);
+            porte[ultimaPorta] =*(mappa -1 + getRoomCount(mappa));
+            
 
             creaStanza(mappa, porte[0], porte[1], porte[2], porte[3], tipoStanza, tipoTrabocchetto, tipoTesoro);
             printf("iterato\n");
@@ -490,7 +493,7 @@ void impostaGioco(struct Stanza** mappa) {
                 cancellaStanzaSelect(mappa); //DONE
                 break;
             case 3: 
-                stampaStanze(mappa); //DONE
+                stampaStanze(mappa); //DONEa
                 break;
             case 4: 
                 generaRandom(mappa); //IN PROGRESS
