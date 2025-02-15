@@ -1,4 +1,21 @@
 // Dichiarazione delle funzioni da chiamare in main.c
+//Funzions
+typedef struct Stanza Stanza;
+typedef struct Giocatore Giocatore;
+
+int getRoomCount();
+void generaSeed(int* seed);
+
+void impostaGioco();
+void gioca();
+void crediti();
+void terminaGioco();
+
+void stampaStanza(Stanza* stanza, int showAll);
+void printRoomType(Stanza* stanza);
+
+
+
 // Definizione dei tipi necessari alla libreria
 
 enum tipo_giocatore {
@@ -61,24 +78,6 @@ struct Giocatore{
     int def;
 
 };
-
-struct gameConfig {};
-
-//Funzions
-
-int getRoomCount(struct Stanza** mappa);
-void generaSeed(int* seed);
-
-void impostaGioco(struct Stanza** mappa);
-void gioca();
-void crediti();
-void terminaGioco();
-
-void stampaStanza(struct Stanza* stanza, int showAll);
-void printRoomType(struct Stanza* stanza);
-
-void writeToFile();
-void Debug(struct Stanza* stanza);
 
 //Enemies
 
