@@ -3,7 +3,6 @@
 typedef struct Stanza Stanza;
 typedef struct Giocatore Giocatore;
 
-int getRoomCount();
 void generaSeed(int* seed);
 
 void impostaGioco();
@@ -11,23 +10,20 @@ void gioca();
 void crediti();
 void terminaGioco();
 
-void stampaStanza(Stanza* stanza, int showAll);
-void printRoomType(Stanza* stanza);
 
+//Subroutines Inserisci
 
+static void stampaStanze();
+static void stampaStanza(Stanza* stanza, int showAll);
+static void stampaTipoStanza(Stanza* stanza);
+static void spingiStanza(Stanza* stanza);
+static int getRoomCount();
 
 // Definizione dei tipi necessari alla libreria
 
 enum tipo_giocatore {
     PRINCIPE,
     DOPPELGANGER,
-};
-
-enum tipo_nemico {
-    MELMA,
-    SCHELETRO,
-    GUARDIA,
-    JAFFAR
 };
 
 enum tipo_stanza {
@@ -65,13 +61,14 @@ struct Stanza {
     enum tipo_trabocchetto tipoTrabocchetto;
     enum tipo_tesoro tipoTesoro;
 
-    struct Stanza* porte [4]; //Ordine: dx, uw, sx, dw (come la circ. goniometrica)
+    Stanza* porte [4]; //Ordine: dx, uw, sx, dw (come la circ. goniometrica)
+    Stanza* successiva;
 };
 
 struct Giocatore{
     char* nome;
     enum tipo_giocatore classe;
-    struct Stanza* posizione;
+    Stanza* posizione;
     int maxHp;
     int currentHp;
     int atk;
@@ -82,7 +79,7 @@ struct Giocatore{
 //Enemies
 
 struct Enemy {
-    enum tipo_nemico tipoNemico;
+    
     int maxHp;
     int currentHp;
     int atk;

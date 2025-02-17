@@ -4,8 +4,8 @@
 #include <time.h>
 
 
-extern Stanza* ptrPrimaStanza;
-extern Stanza* ptrUltimaStanza;
+Stanza* ptrPrimaStanza = NULL;
+Stanza* ptrUltimaStanza = NULL;
 
 // Definizioni delle funzioni in gamelib.c.
 // Piu altre funzioni di supporto.
@@ -14,7 +14,6 @@ extern Stanza* ptrUltimaStanza;
 
 // Funzioni statiche
 
-// #regione Utility
     void generaSeed(int* seed) {
         time_t t;
         srand((unsigned) time(&t));
@@ -25,6 +24,7 @@ extern Stanza* ptrUltimaStanza;
         *seed = input;
         printf("seed is now %d", input);
     }
+
 
     int generaRandomStanza() {
         int tipoStanza = rand() % 10; //roll stanza
@@ -70,376 +70,418 @@ extern Stanza* ptrUltimaStanza;
     int generaRandomPorte(int ultimaPorta) {
         ultimaPorta = (ultimaPorta + 3 + rand() % 3) %4;
         return (ultimaPorta);
-    }
-
-    void  aggiornaUltimaStanza() { //COMPLETA - LL
-        struct Stanza* stanzaCorrente = ptrPrimaStanza;
-        struct Stanza* stanzaPrecedente = NULL;
-        while (stanzaCorrente != NULL) {       
-            for (int i = 0; i < 5; i++) {
-                if(i == 4) { 
-                    ptrUltimaStanza = stanzaCorrente;
-                    return;
-                }
-                    if(stanzaCorrente->porte[i] != NULL && stanzaCorrente->porte[i] != stanzaPrecedente) {
-                    stanzaPrecedente = stanzaCorrente;
-                    stanzaCorrente = stanzaCorrente->porte[i];
-                } else {
-                    stanzaCorrente = NULL;
-                }
-            }        
-        }
-        return ;
-    }
-
-
-    void stampaStanza (Stanza* stanza, int viewAll) {
-
-    if(stanza == NULL) {
-        printf(" Nessuna stanza selezionata.");
-    }
-
-
-    printf("_______________________________\n");
-    printf(" Tipo stanza: ");
-    printRoomType(stanza);
-    printf("\n\n");
-    
-    printf(" Tipo trabocchetto: ");
-    switch(stanza->tipoTrabocchetto) {
-        case NESSUN_TRABOCCHETTO:
-            printf("NESSUN_TRABOCCHETTO\n");
-            break;
-        case PIANOFORTE:
-            printf("PIANOFORTE\n");
-            break;
-        case LAME: 
-            printf("LAME\n");
-            break;
-        case CADUTA: 
-            printf("CADUTA\n");
-            break;
-        case BURRONE: 
-            printf("BURRONE\n");
-            break;
-        default: 
-            printf("errore: tipo trabucchino non valido\n");
-            break;
-    }
-    
-    
-    
-    if(viewAll){
-        printf(" Tipo tesoro: ");
-        switch(stanza->tipoTesoro) {
-            case NESSUN_TESORO:
-                printf("NESSUN_TESORO\n");
-                break;
-            case VELENO:
-                printf("VELENO\n");
-                break;
-            case GUARIGIONE: 
-                printf("GUARIGIONE\n");
-                break;
-            case AUMENTA_HP: 
-                printf("AUMENTA_HP\n");
-                break;
-            case SPADA_TAGLIENTE: 
-                printf("SPADA_TAGLIENTE\n");
-                break;
-            case SCUDO: 
-                printf("SCUDO\n");
-                break;
-            default: 
-                printf("errore: tipo tesoro non valido\n");
-                break;
-        }
-    } else { 
-        if(stanza->tipoTesoro) {
-            printf("La stanza contiente un tesoro sconosciuto...\n");
-        } else {
-            printf("La stanza non contiente un tesoro...\n");
-        }
-    }
-
-
-    printf(" Porta destra: ");
-    if(stanza->porte[0] == NULL) {
-        printf("Chiusa\n");
-    } else printRoomType(stanza->porte[0]);
-
-    printf(" Porta sopra: ");
-    if(stanza->porte[1] == NULL) {
-        printf("Chiusa\n");
-    } else printRoomType(stanza->porte[1]);
-
-    printf(" Porta sinistra: ");
-    if(stanza->porte[2] == NULL) {
-        printf("Chiusa\n");
-    } else printRoomType(stanza->porte[2]);
-
-    printf(" Porta sotto: ");
-    if(stanza->porte[3] == NULL) {
-        printf("Chiusa\n");
-    } else printRoomType(stanza->porte[3]);
-
-    printf("_______________________________\n");
-
-    return;
 }
 
-int getRoomCount() { //COMPLETE - LL
+// subroutines Imposta 
+static int getRoomCount() { //COMPLETE - LL
     int stanzeTotali = 0;
-    struct Stanza* stanzaCorrente = ptrPrimaStanza;
-    struct Stanza* stanzaPrecedente;
+    Stanza* stanzaCorrente = ptrPrimaStanza;
     while (stanzaCorrente != NULL) {       
         stanzeTotali++;
-        for (int i = 0; i < 4; i++) {
-            if(stanzaCorrente->porte[i] != NULL && stanzaCorrente->porte[i] != stanzaPrecedente) {
-                stanzaPrecedente = stanzaCorrente;
-                stanzaCorrente = stanzaCorrente->porte[i];
-            } else {
-                stanzaCorrente = NULL;
-            }
+        stanzaCorrente = stanzaCorrente->successiva;
         }        
-    }
-    
     return stanzeTotali;
-}
+    }
     
 
-// #regione Imposta 
-    static struct Stanza* creaStanza (
-            Stanza* dx, Stanza* uw, Stanza* sx, Stanza* dw,
-            int tipoStanza, int tipoTrabocchetto, int tipoTesoro) {
 
-        struct Stanza* temp = (Stanza *)malloc(sizeof(Stanza));
-        
-        temp->porte[0] = dx;
-        temp->porte[1] = uw;
-        temp->porte[2] = sx;
-        temp->porte[3] = dw;
-        
-        temp->tipoStanza = tipoStanza;
-        temp->tipoTrabocchetto = tipoTrabocchetto;
-        temp->tipoTesoro = tipoTesoro;
-
-        int numStanze = getRoomCount();
-        struct Stanza* ultimaStanza = ptrUltimaStanza;
-
-        if(numStanze) {
-            for (int i = 0; i < 4; i++){
-                if(temp->porte[i] == ultimaStanza) {
-                    ultimaStanza->porte[(i+2)%4] = temp;
-                }
-            }
-            
-        }
-
-        ptrUltimaStanza = temp;
-
-        return temp;
+static void aggiornaUltimaStanza() { //COMPLETA - LL
+    struct Stanza* stanzaCorrente = ptrPrimaStanza;
+    if (stanzaCorrente == NULL)  {
+        ptrUltimaStanza = NULL;
+        return;
     }
 
-    static void inserisciStanza() {
-        struct Stanza* nuovaStanza;
-        int numStanze = getRoomCount(); 
+    while (stanzaCorrente->successiva != NULL) {       
+        stanzaCorrente = stanzaCorrente->successiva;     
+    }
+    
+    ptrUltimaStanza = stanzaCorrente;
+}
 
-        struct Stanza* porte [4] = {NULL, NULL, NULL, NULL}; 
-        
-        int porta = 5;
+static void stampaStanza (Stanza* stanza, int viewAll) {
 
-        if (numStanze >= 15) {
-            printf("Numero massimo di stanze raggiunto.\n");
-            return;
-        }
+if(stanza == NULL) {
+    printf(" Nessuna stanza selezionata.");
+}
 
-        // pick doors
 
-        while(1) { // selezione porta
-        
-            printf("Da quale porta si accede alla stanza?:\n"
-            " 0) DESTRA\n 1) AVANTI\n 2) SINISTRA\n 3) INDIETRO\n");
+printf("_______________________________\n");
+printf(" Tipo stanza: ");
+stampaTipoStanza(stanza);
+printf("\n\n");
 
-            if ((scanf("%d", &porta) == 1) && porta >= 0 && porta <= 4) {
-                // do nun
-            } else {
-                printf("Input non valido.\n");
-                while (getchar() != '\n');
-                continue;
-            } 
+printf(" Tipo trabocchetto: ");
+switch(stanza->tipoTrabocchetto) {
+    case NESSUN_TRABOCCHETTO:
+        printf("NESSUN_TRABOCCHETTO\n");
+        break;
+    case PIANOFORTE:
+        printf("PIANOFORTE\n");
+        break;
+    case LAME: 
+        printf("LAME\n");
+        break;
+    case CADUTA: 
+        printf("CADUTA\n");
+        break;
+    case BURRONE: 
+        printf("BURRONE\n");
+        break;
+    default: 
+        printf("errore: tipo trabucchino non valido\n");
+        break;
+}
 
-            if (numStanze) {
 
-                if (ptrUltimaStanza->porte[(porta + 2)%4] != NULL) {
-                    printf("La porta corrispondente è già in uso.\n");
-                    continue;
-                }
 
-                porte[porta] = ptrUltimaStanza;
-            }
+if(viewAll){
+    printf(" Tipo tesoro: ");
+    switch(stanza->tipoTesoro) {
+        case NESSUN_TESORO:
+            printf("NESSUN_TESORO\n");
             break;
+        case VELENO:
+            printf("VELENO\n");
+            break;
+        case GUARIGIONE: 
+            printf("GUARIGIONE\n");
+            break;
+        case AUMENTA_HP: 
+            printf("AUMENTA_HP\n");
+            break;
+        case SPADA_TAGLIENTE: 
+            printf("SPADA_TAGLIENTE\n");
+            break;
+        case SCUDO: 
+            printf("SCUDO\n");
+            break;
+        default: 
+            printf("errore: tipo tesoro non valido\n");
+            break;
+    }
+} else { 
+    if(stanza->tipoTesoro) {
+        printf("La stanza contiente un tesoro sconosciuto...\n");
+    } else {
+        printf("La stanza non contiente un tesoro...\n");
+    }
+}
 
-        }
 
+printf(" Porta destra: ");
+if(stanza->porte[0] == NULL) {
+    printf("Chiusa\n");
+} else stampaTipoStanza(stanza->porte[0]);
 
-        // pick verythign else
-        int contenuti [] = {0, 0, 0};
+printf(" Porta sopra: ");
+if(stanza->porte[1] == NULL) {
+    printf("Chiusa\n");
+} else stampaTipoStanza(stanza->porte[1]);
 
-        while(1) { // selezione stanza
-            printf("Inserisci tipo stanza:\n"
-            " 0) CORRIDOIO\n 1) SCALA\n 2) SALA BANCHETTO\n 3) MAGAZZINO"
-            "\n 4) POSTAZIONE DI GUARDIA\n 5) PRIGIONE\n 6) ARMERIA\n 7) MOSCHEA\n"
-            " 8) TORRE\n 9) BAGNI\n");
+printf(" Porta sinistra: ");
+if(stanza->porte[2] == NULL) {
+    printf("Chiusa\n");
+} else stampaTipoStanza(stanza->porte[2]);
 
-            if ((scanf("%d", &contenuti[0]) == 1) && contenuti[0] >= 0 && contenuti[0] <= 9) {
-                break;
-            } else {
-                printf("Input non valido.\n");
-                while (getchar() != '\n');
-                continue;
-            } 
-        }
+printf(" Porta sotto: ");
+if(stanza->porte[3] == NULL) {
+    printf("Chiusa\n");
+} else stampaTipoStanza(stanza->porte[3]);
 
-        while(1) { // selezione trabocchetto
-            printf("Inserisci tipo trabocchetto:\n"
-            " 1) PIANOFORTE\n 2) LAME\n 3) BANANA\n 4) BURRONE\n 0) NESSUNO\n");
+printf("_______________________________\n");
 
-            if ((scanf("%d", &contenuti[1]) == 1) && contenuti[1] >= 0 && contenuti[1] <= 4) {
-                break;
-            } else {
-                printf("Input is invalid.\n");
-                while (getchar() != '\n');
-                continue;
-            } 
-        }
+return;
+}
 
-        while(1) { // selezione tesoro
-            printf("Inserisci tipo tesoro:\n"
-            " 1) VELENO\n 2) GUARIGIONE\n 3) AUMENTA_HP\n 4) SPADA_TAGLIENTE\n"
-            " 5) SCUDO\n 0) NESSUNO\n");
-
-            if ((scanf("%d", &contenuti[2]) == 1) && contenuti[2] >= 0 && contenuti[2] <= 5) {
-                break;
-            } else {
-                printf("Input is invalid.\n");
-                while (getchar() != '\n');
-                continue;
-            } 
-        }
-
-        nuovaStanza = creaStanza(porte[0], porte[1], porte[2], porte[3], contenuti[0], contenuti[1], contenuti[2]);
-        
-    return;
+static void stampaStanze() {
+    printf("stampaStanze called.\n");
+    Stanza* stanzaCorrente = ptrPrimaStanza;
+    
+    if(!stanzaCorrente) { //caso 0 stanze
+        printf("Nessuna stanza selezionata. Ji Nio.\n");
     }
 
-    static void cancellaStanza() {
-        if (getRoomCount() > 1) {
-                struct Stanza* penultimaStanza;
-                for (int i = 0; i < 4; i++) {
-                    if (ptrUltimaStanza->porte[i] != NULL) {
-                        penultimaStanza = ptrUltimaStanza->porte[i];
+    while (stanzaCorrente != NULL) { //iteratore
+        stampaStanza(stanzaCorrente, 1);
+        stanzaCorrente = stanzaCorrente->successiva;
+    }
+    return;        
+}
 
-                        penultimaStanza->porte[(i + 2)% 4] = NULL;
-                        free(ptrUltimaStanza);
-                        ptrUltimaStanza = penultimaStanza;
-                    }
-                }
-            
+static Stanza* creaStanza(int tipoStanza, int tipoTrabocchetto, int tipoTesoro) {
+    printf("creaStanza called!\n");
+    Stanza* temp = (Stanza*)malloc(sizeof(Stanza));
+    
+    temp->porte[0] = NULL;
+    temp->porte[1] = NULL;
+    temp->porte[2] = NULL;
+    temp->porte[3] = NULL;
+    temp->successiva = NULL;
+    
+    temp->tipoStanza = tipoStanza;
+    temp->tipoTrabocchetto = tipoTrabocchetto;
+    temp->tipoTesoro = tipoTesoro;
+    
+    return temp;
+}
+
+static void connettiStanza(Stanza* stanza, int indicePorta) {
+    if(!getRoomCount()) {
+        return;
+    }
+
+    printf("connettiStanza called!\n");
+    stanza->porte[indicePorta] = ptrUltimaStanza;
+    
+    ptrUltimaStanza->porte[(indicePorta + 2) %4] = stanza;
+    ptrUltimaStanza->successiva = stanza;
+}
+
+static void spingiStanza(Stanza* stanza) {
+    printf("getRoomsCount: %d \n", getRoomCount());
+    stampaStanze();
+    printf("spingiStanza called!\n");
+    if(!getRoomCount()) { //caso prima stanza
+        ptrPrimaStanza = stanza;
+        ptrUltimaStanza = stanza;
+    } else {
+        ptrUltimaStanza = stanza;
+    }
+}
+
+static int selezionaPorta() {
+    while(1) { // selezione porta
+    
+        int porta;
+        printf("Da quale porta si accede alla stanza?:\n"
+        " 0) DESTRA\n 1) AVANTI\n 2) SINISTRA\n 3) INDIETRO\n");
+
+        if ((scanf("%d", &porta) == 1) && porta >= 0 && porta < 4) {
+            // do nun
+        } else {
+            printf("Input non valido.\n");
+            while (getchar() != '\n');
+            continue;
+        } 
+
+        if (getRoomCount()) {
+
+            if (ptrUltimaStanza->porte[(porta + 2)%4] != NULL) {
+                printf("La porta corrispondente è già in uso.\n");
+                continue;
             }
+        }   
+        printf("ptrUltimaStanza non è NULL\n");
+        return porta;
+    }
+}
+
+static int selezionaTipoStanza() {
+    int tipoStanza = -1;
+    while(1) { 
+        
+        printf("Inserisci tipo stanza:\n"
+        " 0) CORRIDOIO\n 1) SCALA\n 2) SALA BANCHETTO\n 3) MAGAZZINO"
+        "\n 4) POSTAZIONE DI GUARDIA\n 5) PRIGIONE\n 6) ARMERIA\n 7) MOSCHEA\n"
+        " 8) TORRE\n 9) BAGNI\n");
+
+        if ((scanf("%d", &tipoStanza) == 1) && tipoStanza >= 0 && tipoStanza <= 9) {
+            break;
+        } else {
+            printf("Input non valido.\n");
+            while (getchar() != '\n');
+            continue;
+        } 
+    }
+    return tipoStanza;
+}
+
+static int selezionaTrabocchetto() {
+    int trabocchetto = -1;
+    while(1) { // selezione trabocchetto
+        printf("Inserisci tipo trabocchetto:\n"
+        " 1) PIANOFORTE\n 2) LAME\n 3) BANANA\n 4) BURRONE\n 0) NESSUNO\n");
+
+        if ((scanf("%d", &trabocchetto) == 1) && trabocchetto >= 0 && trabocchetto <= 4) {
+            break;
+        } else {
+            printf("Input is invalid.\n");
+            while (getchar() != '\n');
+            continue;
+        } 
+    }
+    return trabocchetto;
+}
+
+static int selezionaTesoro() {
+    int tesoro = -1;
+    while(1) { // selezione tesoro
+        printf("Inserisci tipo tesoro:\n"
+        " 1) VELENO\n 2) GUARIGIONE\n 3) AUMENTA_HP\n 4) SPADA_TAGLIENTE\n"
+        " 5) SCUDO\n 0) NESSUNO\n");
+
+        if ((scanf("%d", &tesoro) == 1) && tesoro >= 0 && tesoro <= 5) {
+            break;
+        } else {
+            printf("Input is invalid.\n");
+            while (getchar() != '\n');
+            continue;
+        } 
+    }
+    return tesoro;
+}
+
+static void creaStanzaMain() {
+
+    struct Stanza* porte [4] = {NULL, NULL, NULL, NULL}; 
+    
+    if (getRoomCount()  >= 15) {
+        printf("Numero massimo di stanze raggiunto.\n");
+        return;
     }
 
-    static void cancellaStanzaSelect() {
-        if (getRoomCount() == 0) {
-            printf("Non ci sono stanze su questa mappa.\n");
+    Stanza* nuovaStanza = creaStanza(selezionaTipoStanza(), selezionaTrabocchetto(), selezionaTesoro());
+    
+    connettiStanza(nuovaStanza, selezionaPorta());
+    spingiStanza(nuovaStanza);
+    
+    return;
+}
+
+static void cancellaStanza() {
+    
+    Stanza* stanzaCorrente = ptrPrimaStanza;
+
+    if(stanzaCorrente == ptrUltimaStanza) {
+        free(stanzaCorrente);
+        ptrPrimaStanza = NULL;
+        ptrUltimaStanza = NULL;
+    }
+    
+    while(stanzaCorrente->successiva != ptrUltimaStanza) {
+        stanzaCorrente = stanzaCorrente->successiva;
+    }
+
+    free (stanzaCorrente->successiva);
+    stanzaCorrente->successiva = NULL;
+    ptrUltimaStanza = stanzaCorrente;
+    printf("stanza deletata alla grande!\n");
+    return;    
+}
+
+void stampaTipoStanza(Stanza* stanza) {
+    switch(stanza->tipoStanza) {
+        case CORRIDOIO: 
+            printf("CORRIDOIO\n");
+            break;
+        case SCALA:
+            printf("SCALA\n");
+            break;
+        case SALA_BANCHETTO: 
+            printf("SALA BANCHETTO\n");
+            break;
+        case MAGAZZINO: 
+            printf("MAGAZZINO\n");
+            break;
+        case POSTO_GUARDIA: 
+            printf("POSTO DI GUARDIA\n");
+            break;
+        case PRIGIONE: 
+            printf("PRIGIONE\n");
+            break;
+        case ARMERIA: 
+            printf("ARMERIA\n");
+            break;
+        case MOSCHEA: 
+            printf("MOSCHEA\n");
+            break;
+        case TORRE: 
+            printf("TORRE\n");
+            break;
+        case BAGNI: 
+            printf("BAGNI\n");
+            break;
+        default: 
+            printf("errore: tipo stanza non valido\n");
+            break;
+    }
+    
+}
+
+
+
+static void cancellaStanzaSelect() {
+    if (!getRoomCount()) {
+        printf("Non ci sono stanze su questa mappa.\n");
+        return;
+    }
+
+    printf("Ultima stanza creata:\n\n");
+    stampaStanza(ptrUltimaStanza, 1);
+    printf("Vuoi davvero cancellare questa stanza?\n0) Annulla\n1) Conferma\n");
+    int temp = 0;
+
+    if ((scanf("%d", &temp) == 1) && temp <= 1 && temp >= 0) {
+        if(temp == 0) {
+            printf("Operazione annullata.\n");
             return;
         }
 
-        printf("Ultima stanza creata:\n\n");
-        stampaStanza(ptrUltimaStanza, 1);
-        printf("Vuoi davvero cancellare questa stanza?\n0) Annulla\n1) Conferma\n");
-        int temp = 0;
 
-        if ((scanf("%d", &temp) == 1) && temp <= 1 && temp >= 0) {
-            if(temp == 0) {
-                printf("Operazione annullata.\n");
-                return;
-            }
+        cancellaStanza();
+        
+        printf("Cancellazione completa!\n");
+        
+        } else {
+            printf("Input non valido.\n");
+            while (getchar() != '\n');
+        } 
 
+}
 
-            cancellaStanza();
-            
-            printf("Cancellazione completa!\n");
-            
-            } else {
-                printf("Input non valido.\n");
-                while (getchar() != '\n');
-            } 
+static void generaRandom() {
+    printf("generaRandom called.\n");
 
+    //Cancella tutte
+    int temp = getRoomCount();
+    for (int i = 0; i < temp; i++) {
+        cancellaStanza();
     }
 
-    static void stampaStanze() {
-        printf("stampaStanze called.\n");
-        Stanza* stanzaCorrente = ptrPrimaStanza;
-        Stanza* stanzaPrecedente;
-        Stanza* stanzaSuccessiva;
+    //Genera Ex Novo
+    int ultimaPorta = rand() %4;
+    for (int i = 0; i < 15; i++) {
+                
+        struct Stanza* porte[4] = {NULL, NULL, NULL, NULL};
 
-        while (stanzaCorrente != NULL) {
-            stampaStanza(stanzaCorrente, 1);
-            for (int i = 0; i < 4; i++) {
-                if ((stanzaCorrente->porte[i] != NULL) && (stanzaCorrente->porte[i] != stanzaPrecedente)) {
-                    stanzaSuccessiva = stanzaCorrente->porte[i];
-                }
-            }
-            stanzaSuccessiva = stanzaCorrente;
-            stanzaCorrente = stanzaPrecedente;
-        }
-        return;        
+        int tipoStanza = generaRandomStanza();
+
+        int tipoTrabocchetto = generaRandomTrabocchetto();
+        
+        int tipoTesoro = generaRandomTesoro();
+
+        ultimaPorta = generaRandomPorte(ultimaPorta);
+        porte[ultimaPorta] = ptrUltimaStanza;
+        
+
+        creaStanza (tipoStanza, tipoTrabocchetto, tipoTesoro);
+        printf("iterato\n");
     }
 
-    static void generaRandom() {
-        printf("generaRandom called.\n");
+    printf("Se riesci a leggere questo, non hai segfaultato\n");
+}
 
-        //Cancella tutte
-        int temp = getRoomCount();
-        for (int i = 0; i < temp; i++) {
-            cancellaStanza();
-        }
-
-        //Genera Ex Novo
-        int ultimaPorta = rand() %4;
-        for (int i = 0; i < 15; i++) {
-                    
-            struct Stanza* porte[4] = {NULL, NULL, NULL, NULL};
-
-            int tipoStanza = generaRandomStanza();
-
-            int tipoTrabocchetto = generaRandomTrabocchetto();
-            
-            int tipoTesoro = generaRandomTesoro();
-
-            ultimaPorta = generaRandomPorte(ultimaPorta);
-            porte[ultimaPorta] = ptrUltimaStanza;
-            
-
-            creaStanza (porte[0], porte[1], porte[2], porte[3], tipoStanza, tipoTrabocchetto, tipoTesoro);
-            printf("iterato\n");
-        }
-
-        printf("Se riesci a leggere questo, non hai segfaultato\n");
+static int chiudiMappa() {
+    int temp = getRoomCount();
+    if (temp != 15) {
+        printf("La mappa ha %d stanze. Puoi salvare solo mappe con 15 stanze esatte.\n", temp);
+        return 0;
     }
 
-    static int chiudiMappa() {
-        int temp = getRoomCount();
-        if (temp != 15) {
-            printf("La mappa ha %d stanze. Puoi salvare solo mappe con 15 stanze esatte.\n", temp);
-            return 0;
-        }
+    return 1;
+}
 
-        return 1;
-    }
-
-// #endregion 
 
 
 static void avanza() {
@@ -517,7 +559,7 @@ void impostaGioco() {
         if (scanf("%d", &temp) == 1) {
         switch (temp) {
             case 1:
-                inserisciStanza(); //DONE 
+                creaStanzaMain(); //DONE 
                 break;
             case 2: 
                 cancellaStanzaSelect(); //DONE
@@ -608,42 +650,3 @@ void writeToFile(const char *filename, struct Stanza *s) {
 
     fclose(file);
 }*/
-
-void stampaTipoStanza(Stanza* stanza) {
-    switch(stanza->tipoStanza) {
-        case CORRIDOIO: 
-            printf("CORRIDOIO\n");
-            break;
-        case SCALA:
-            printf("SCALA\n");
-            break;
-        case SALA_BANCHETTO: 
-            printf("SALA BANCHETTO\n");
-            break;
-        case MAGAZZINO: 
-            printf("MAGAZZINO\n");
-            break;
-        case POSTO_GUARDIA: 
-            printf("POSTO DI GUARDIA\n");
-            break;
-        case PRIGIONE: 
-            printf("PRIGIONE\n");
-            break;
-        case ARMERIA: 
-            printf("ARMERIA\n");
-            break;
-        case MOSCHEA: 
-            printf("MOSCHEA\n");
-            break;
-        case TORRE: 
-            printf("TORRE\n");
-            break;
-        case BAGNI: 
-            printf("BAGNI\n");
-            break;
-        default: 
-            printf("errore: tipo stanza non valido\n");
-            break;
-    }
-    
-}

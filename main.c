@@ -13,8 +13,7 @@ int main( ) {
     generaSeed(&seed);
 
     //allocazione memoria
-    extern Stanza* ptrPrimaStanza;
-    extern Stanza* ptrUltimaStanza;
+    
 
     Giocatore** giocatori = (Giocatore**)malloc(__SIZEOF_POINTER__*4);
 
