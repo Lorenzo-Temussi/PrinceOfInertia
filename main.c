@@ -9,11 +9,7 @@
 
 int main( ) {
 
-    int seed = 0;
-    generaSeed(&seed);
-
-    //allocazione memoria
-    
+    inizializzaSeme();
 
     Giocatore** giocatori = (Giocatore**)malloc(__SIZEOF_POINTER__*4);
 
@@ -27,16 +23,16 @@ int main( ) {
         if (scanf("%d", &state) == 1) {
             switch(state) {
             case 1:
-                impostaGioco(); //DONE
+                impostaGioco(); //COMPLETA!
                 break;
             case 2:
-                gioca(); //inputs firstRoom, lastRoom -> ()
+                gioca(); //WIP
                 break;
             case 3:
-                terminaGioco(); //DONE
+                terminaGioco(); //COMPLETA
                 break;
             case 4: 
-                crediti(); // - -> printf()
+                crediti(); //WIP
                 break;
             default:
                 printf("Input is invalid.\n");
