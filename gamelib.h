@@ -58,8 +58,11 @@ void impostaGioco();
 
 static int inserisciNumeroGiocatori();
 static Giocatore* creaGiocatore();
+static void popolaGiocatore(Giocatore* giocatore);
 static void inserisciGiocatore(Giocatore* giocatore);
 static void determinaOrdineTurno();
+static Giocatore* ptrGiocatoreNumero(int indice);
+static int ottieniNumeroGiocatori();
 
 // Gioca_Turno
 
@@ -149,6 +152,9 @@ struct Giocatore{
     int saluteCorrente;
     int attacco;
     int difesa;
+
+    int numEvadiTrabocchetto;
+    int numFuga;
 
     Giocatore* successivo;
 

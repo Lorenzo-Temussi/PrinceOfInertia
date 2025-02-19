@@ -2,6 +2,7 @@
 #include <bits/time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/time.h>
 #include <time.h>
 
@@ -585,7 +586,7 @@ int* semePtr = &seme;
 
     static int partitaConclusa() {
         Giocatore* temp = ptrPrimoGiocatore;
-        if (!temp) {
+            if (!temp) {
             printf("Errore: 0 giocatori nella lista\n");
             return -1;
         } 
@@ -593,12 +594,24 @@ int* semePtr = &seme;
         if(haiSconfittoJaffar()) {
             return 1;
         }
-        while(temp->successivo != NULL) {
-            if (temp->saluteCorrente != 0) {
+        for(int i = 0; i < ottieniNumeroGiocatori(); i++) {
+            if (ptrGiocatoreNumero(i)->saluteCorrente != 0) {
                 return 0;
             }
         }
         return 1;
+    }
+
+    static int ottieniNumeroGiocatori() {
+        Giocatore* temp = ptrPrimoGiocatore;
+        int numero = 0;
+
+        while(temp && temp->successivo) {
+            temp = temp->successivo;
+            numero++;
+        }
+
+        return numero;
     }
 
     static int inserisciNumeroGiocatori() {
@@ -617,6 +630,17 @@ int* semePtr = &seme;
             }  
             while (getchar() != '\n');
         } while(!(playerNum <= 4 && playerNum >= 1));
+
+        Giocatore* listaGiocatori [playerNum];
+        for (int i = 0; i < playerNum; i++) {
+            listaGiocatori[i] = creaGiocatore();
+            inserisciGiocatore(listaGiocatori[i]);
+
+        }
+
+        for (int i = 0; i < playerNum; i++) {
+            popolaGiocatore(ptrGiocatoreNumero(i));
+        }
         return playerNum;
     }
 
@@ -634,23 +658,96 @@ int* semePtr = &seme;
         temp->successivo = giocatore;
     }
 
+    static Giocatore* ptrGiocatoreNumero(int indice) {
+        Giocatore* temp = ptrPrimoGiocatore;
+
+        while(indice > 0) {
+            temp = temp->successivo;
+            indice--;
+        }
+        return temp;
+    }
+
     static Giocatore* creaGiocatore() {
+        //printf("Crea giocatore chiamata\n");
         Giocatore* giocatore = (Giocatore*)malloc(sizeof(Giocatore));
 
 
         giocatore->attacco = 1;
-        giocatore->classe = 0;
+        giocatore->classe = -1;
         giocatore->difesa = 1;
-        giocatore->nome = "Hilter";
+        giocatore->nome = "Giocatore X";
         giocatore->posizione = NULL;
         giocatore->saluteMax = 3;
         giocatore->saluteCorrente = 3;
+        giocatore->numFuga = 2;
+        giocatore->numEvadiTrabocchetto = 0;
 
         giocatore->successivo = NULL;
+
 
         return giocatore;
     }
 
+    static void popolaGiocatore(Giocatore* giocatore) {
+        int temp;
+        Giocatore* tempGiocatore = ptrPrimoGiocatore;
+        int numGiocatori = ottieniNumeroGiocatori();
+
+        while(tempGiocatore != giocatore) {
+            if(tempGiocatore->classe == PRINCIPE) {
+                giocatore->classe = DOPPELGANGER;
+                printf("Almeno 1 principe\n");
+                break;
+            }
+
+            if(tempGiocatore->successivo->successivo == NULL) {
+
+                giocatore->classe = PRINCIPE;
+                break;
+            }
+
+            tempGiocatore = tempGiocatore->successivo;
+        }
+
+
+        while(giocatore->classe == -1) {
+            printf("Seleziona la classe:\n 0) PRINCIPE\n 1) DOPPELGANGER\n");
+            if(scanf("%d", &temp) != 0 && temp >= 0 && temp <= 1) {
+                giocatore->classe = temp;
+                break;
+            } else {
+                printf("Input non valido.\n");
+            }  
+            while (getchar() != '\n');
+        
+        }
+        
+
+        if(giocatore->classe == PRINCIPE) {
+            printf("si nu principe\n");
+            giocatore->numEvadiTrabocchetto = 1;
+            giocatore->numFuga = 1;
+        } else {
+            printf("SI nu bucciott\n");
+        }
+
+
+        char string[100];
+        while(1) {
+            printf("Inserisci nome:\n ");
+            if(scanf("%99s", string)) {
+                giocatore->nome = malloc(strlen(string) + 1);
+                break;
+            } else {
+                printf("Input non valido.\n");
+            }  
+            while (getchar() != '\n');
+        }
+            strcpy(giocatore->nome, string);  // Copy the string into the allocated memory
+        return;
+    }
+        
     static void avanza() {
     printf("avanza called.\n");
     }
@@ -713,40 +810,35 @@ int* semePtr = &seme;
     }
 
     static void giocaTurno(Giocatore* giocatore) {
+        
         int choice;
-        printf("scegli un'azione pisé:\n1) Lotta!\n2) Vinci\n3) Scappa\n");
+        printf("scegli un'azione %s:\n 1) Lotta!\n 2) Vinci\n 3) Scappa\n"
+        " 4) Stampa Giocatore\n 5) Stampa Zona\n 6) Prendi Tesoro\n"
+        " 7) Cerca Porta Segreta\n 8) Passa Turno\n", giocatore->nome);
         if (scanf("%d", &choice) == 1) { 
             switch (choice) {
                 case 1: 
                     avanza();
-                    printf("Lotti per un turno intero!\n");
                     break;
                 case 2: 
-                    printf("Sconfiggi l'avversario!\n");
                     combatti();
                     break;
                 case 3:
-                    printf("scappi dal confronto\n");
                     scappa();
                     break;
                 case 4: 
-                    printf("Riesci a fuggire per il rotto della cuffia...\n");
                     stampaGiocatore(giocatore);
                     break;
                 case 5:
-                    printf("Skibedi toiler stampa zona\n");
                     stampaStanza(giocatore->posizione, 0);
                     break;
                 case 6:
-                    printf("prendi il el tesoros\n");
                     prendiTesoro();
                     break;
                 case 7: 
-                    printf("cerca la porta segreta\n");
                     cercaPortaSegreta();
                     break;
                 case 8: 
-                    printf("WWe good\n");
                     passaTurno();
                     break;
                 default: 
@@ -769,11 +861,14 @@ int* semePtr = &seme;
         while (partitaConclusa() == 0) {                
             int temp;
             // genera un giocatore non turnato
-            while(1) {
-                giocaTurno(giocatoreCorrente);
-                giocatoreCorrente = giocatoreCorrente->successivo;
+            for(int i = 0; i < numGiocatori; i++) {
+                giocaTurno(ptrGiocatoreNumero(i));
+                if (i == numGiocatori) 
+                {i = -1;}
             }
         }
+
+        
         return;
     } 
 
