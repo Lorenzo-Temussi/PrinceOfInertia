@@ -391,6 +391,18 @@ int* semePtr = &seme;
         temp->porte[2] = NULL;
         temp->porte[3] = NULL;
         temp->successiva = NULL;
+
+        char* stringa[10];
+
+        for(int i = 0; i<4; i++) {
+            temp->direzionePorte[0] = malloc(sizeof(stringa));
+        }
+
+        temp->direzionePorte[0] = "DESTRA";
+        temp->direzionePorte[1] = "AVANTI";
+        temp->direzionePorte[2] = "SINISTRA";
+        temp->direzionePorte[3] = "INDIETRO";
+
         
         temp->tipoStanza = tipoStanza;
         temp->tipoTrabocchetto = tipoTrabocchetto;
@@ -457,6 +469,12 @@ int* semePtr = &seme;
         
         while(stanzaCorrente->successiva != ptrUltimaStanza) {
             stanzaCorrente = stanzaCorrente->successiva;
+        }
+
+        for(int i = 0; i < 4; i++) {
+            if (stanzaCorrente->porte[i] == ptrUltimaStanza) {
+                stanzaCorrente->porte[i] = NULL;
+            }
         }
 
         free (stanzaCorrente->successiva);
@@ -745,17 +763,52 @@ int* semePtr = &seme;
             while (getchar() != '\n');
         }
             strcpy(giocatore->nome, string);  // Copy the string into the allocated memory
+        
+        giocatore->posizione = ptrPrimaStanza;
+        
         return;
     }
         
-    static void avanza() {
-    printf("avanza called.\n");
+    static void avanza(Giocatore* giocatore) {
+        int indice = 0;
+        int scelta = -1;
+        
+        
+        while(1) {
+
+            printf("Scegli una direzione:\n");
+
+            for(indice = 0; indice < 4; indice++) {
+                if(giocatore->posizione->porte[indice] != NULL) {
+                
+                printf(" %d) %s: ", indice, giocatore->posizione->direzionePorte[indice]);
+                stampaTipoStanza(giocatore->posizione->porte[indice]);
+                }
+                printf("\n");
+            }            
+
+            if(scanf("%d", &scelta) && giocatore->posizione->porte[scelta]) {
+                printf("%s si muove verso ", giocatore->nome);
+                stampaTipoStanza(giocatore->posizione->porte[scelta]);
+                giocatore->posizione = giocatore->posizione->porte[scelta];
+            } else {
+                printf("input incorretto");
+            }
+        
+        }
+        printf("avanza called.\n");
     }
     
     // Blocco Combatti
 
-        static void vinci() {
+        static void vinci(Giocatore* giocatore) {
             printf("vinci called.\n");
+            if(giocatore->saluteCorrente <= giocatore->saluteMax) {
+                giocatore->saluteCorrente++;
+                printf("Ti riposi dopo la battaglia, e ti senti più in salute.\n");
+            } else  {
+            printf("Vittoria perfetta!");
+            }
         } 
         
         static void combatti() {
@@ -770,11 +823,7 @@ int* semePtr = &seme;
                             break;
                         case 2: 
                             printf("Sconfiggi l'avversario!\n");
-                            vinci();
-                            break;
-                        case 3: 
-                            printf("Riesci a fuggire per il rotto della cuffia...\n");
-                            scappa();
+                            vinci(giocatoreCorrente);
                             break;
                         default: 
                             printf("Opzione non valida.\n");
@@ -812,13 +861,13 @@ int* semePtr = &seme;
     static void giocaTurno(Giocatore* giocatore) {
         
         int choice;
-        printf("scegli un'azione %s:\n 1) Lotta!\n 2) Vinci\n 3) Scappa\n"
+        printf("scegli un'azione %s:\n 1) Avanza!\n 2) Vinci\n 3) Scappa\n"
         " 4) Stampa Giocatore\n 5) Stampa Zona\n 6) Prendi Tesoro\n"
         " 7) Cerca Porta Segreta\n 8) Passa Turno\n", giocatore->nome);
         if (scanf("%d", &choice) == 1) { 
             switch (choice) {
                 case 1: 
-                    avanza();
+                    avanza(giocatore);
                     break;
                 case 2: 
                     combatti();

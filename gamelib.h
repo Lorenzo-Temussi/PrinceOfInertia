@@ -66,7 +66,7 @@ static int ottieniNumeroGiocatori();
 
 // Gioca_Turno
 
-static void avanza();
+static void avanza(Giocatore* giocatore);
 static void combatti();
 static void scappa();
 static void prendiTesoro();
@@ -141,6 +141,7 @@ struct Stanza {
     enum tipo_tesoro tipoTesoro;
 
     Stanza* porte [4]; //Ordine: dx, uw, sx, dw (come la circ. goniometrica)
+    char* direzionePorte [4];
     Stanza* successiva;
 };
 
@@ -157,6 +158,7 @@ struct Giocatore{
     int numFuga;
 
     Giocatore* successivo;
+    Giocatore* punteggio;
 
 };
 
