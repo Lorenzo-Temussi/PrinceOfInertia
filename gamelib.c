@@ -282,7 +282,7 @@ int* semePtr = &seme;
     printf("_______________________________\n");
     printf(" Tipo stanza: ");
     stampaTipoStanza(stanza);
-    printf("\n\n");
+    printf("\n");
 
     printf(" Tipo trabocchetto: ");
     switch(stanza->tipoTrabocchetto) {
@@ -335,34 +335,22 @@ int* semePtr = &seme;
         }
     } else { 
         if(stanza->tipoTesoro) {
-            printf("La stanza contiente un tesoro sconosciuto...\n");
+            printf(" La stanza contiente un tesoro sconosciuto...\n");
         } else {
-            printf("La stanza non contiente un tesoro...\n");
+            printf(" La stanza non contiente un tesoro...\n");
         }
     }
 
+    for(int i = 0; i < 4; i++) {
+        printf(" PORTA %s: ", stanza->direzionePorte[i]);
+        if (stanza->porte[i] == NULL) {
+            printf("Chiusa\n");
+            continue;
+        }
+        stampaTipoStanza(stanza->porte[i]);
+    }
 
-    printf(" Porta destra: ");
-    if(stanza->porte[0] == NULL) {
-        printf("Chiusa\n");
-    } else stampaTipoStanza(stanza->porte[0]);
-
-    printf(" Porta sopra: ");
-    if(stanza->porte[1] == NULL) {
-        printf("Chiusa\n");
-    } else stampaTipoStanza(stanza->porte[1]);
-
-    printf(" Porta sinistra: ");
-    if(stanza->porte[2] == NULL) {
-        printf("Chiusa\n");
-    } else stampaTipoStanza(stanza->porte[2]);
-
-    printf(" Porta sotto: ");
-    if(stanza->porte[3] == NULL) {
-        printf("Chiusa\n");
-    } else stampaTipoStanza(stanza->porte[3]);
-
-    printf("_______________________________\n");
+    printf("_______________________________\n\n");
 
     return;
     }
@@ -791,6 +779,7 @@ int* semePtr = &seme;
                 printf("%s si muove verso ", giocatore->nome);
                 stampaTipoStanza(giocatore->posizione->porte[scelta]);
                 giocatore->posizione = giocatore->posizione->porte[scelta];
+                return;
             } else {
                 printf("input incorretto");
             }
