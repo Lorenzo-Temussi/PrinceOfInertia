@@ -278,7 +278,6 @@ int* semePtr = &seme;
         printf(" Nessuna stanza selezionata.");
     }
 
-
     printf("_______________________________\n");
     printf(" Tipo stanza: ");
     stampaTipoStanza(stanza);
@@ -305,8 +304,6 @@ int* semePtr = &seme;
             printf("errore: tipo trabucchino non valido\n");
             break;
     }
-
-
 
     if(viewAll){
         printf(" Tipo tesoro: ");
@@ -850,38 +847,49 @@ int* semePtr = &seme;
     static void giocaTurno(Giocatore* giocatore) {
         
         int choice;
-        printf("scegli un'azione %s:\n 1) Avanza!\n 2) Vinci\n 3) Scappa\n"
-        " 4) Stampa Giocatore\n 5) Stampa Zona\n 6) Prendi Tesoro\n"
-        " 7) Cerca Porta Segreta\n 8) Passa Turno\n", giocatore->nome);
-        if (scanf("%d", &choice) == 1) { 
-            switch (choice) {
-                case 1: 
-                    avanza(giocatore);
-                    break;
-                case 2: 
-                    combatti();
-                    break;
-                case 3:
-                    scappa();
-                    break;
-                case 4: 
-                    stampaGiocatore(giocatore);
-                    break;
-                case 5:
-                    stampaStanza(giocatore->posizione, 0);
-                    break;
-                case 6:
-                    prendiTesoro();
-                    break;
-                case 7: 
-                    cercaPortaSegreta();
-                    break;
-                case 8: 
-                    passaTurno();
-                    break;
-                default: 
-                    printf("Opzione non valida.\n");
-                    break;
+        int numAvanza = 1;
+
+        while(1) {
+
+            printf("scegli un'azione %s:\n 1) Avanza!\n 2) Vinci\n 3) Scappa\n"
+            " 4) Stampa Giocatore\n 5) Stampa Zona\n 6) Prendi Tesoro\n"
+            " 7) Cerca Porta Segreta\n 8) Passa Turno\n", giocatore->nome);
+            if (scanf("%d", &choice) == 1) { 
+                switch (choice) {
+                    case 1: 
+                        if(numAvanza > 0) {
+                            printf("%d\n", numAvanza);
+                            numAvanza = 0;
+                            avanza(giocatore);
+                        } else {
+                            printf("Hai finito i piedi.\n");
+                        }
+                        break;
+                    case 2: 
+                        combatti();
+                        break;
+                    case 3:
+                        scappa();
+                        break;
+                    case 4: 
+                        stampaGiocatore(giocatore);
+                        break;
+                    case 5:
+                        stampaStanza(giocatore->posizione, 0);
+                        break;
+                    case 6:
+                        prendiTesoro();
+                        break;
+                    case 7: 
+                        cercaPortaSegreta();
+                        break;
+                    case 8: 
+                        passaTurno();
+                        return;
+                    default: 
+                        printf("Opzione non valida.\n");
+                        break;
+                }
             }
         }
     }
