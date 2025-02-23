@@ -2,6 +2,7 @@
 //Funzions
 typedef struct Stanza Stanza;
 typedef struct Giocatore Giocatore;
+typedef struct Nemico Nemico;
 
 //
 // SEZIONE 1 - IMPOSTA
@@ -67,11 +68,13 @@ static int ottieniNumeroGiocatori();
 // Gioca_Turno
 
 static void avanza(Giocatore* giocatore);
-static void combatti();
+static void combatti(Giocatore* giocatore, Nemico* nemico);
+static void vinciCombattimento(Giocatore* giocatore, Nemico** nemico);
+static void perdiCombattimento(Giocatore* giocatore);
 static void scappa();
 static void prendiTesoro();
 static void cercaPortaSegreta();
-static void passaTurno();
+static int passaTurno(Nemico* nemico);
 
 static void innescaTrabocchetto(Giocatore* giocatore, Stanza* stanza);
 static int generaRandomNemico();
@@ -138,6 +141,13 @@ enum tipo_tesoro {
     SCUDO 
 };
 
+enum tipo_nemico {
+    NESSUN_NEMICO,
+    SCHELETRO,
+    GUARDIA,
+    JAFFAR
+};
+
 struct Stanza {
     enum tipo_stanza tipoStanza;
     enum tipo_trabocchetto tipoTrabocchetto;
@@ -167,10 +177,10 @@ struct Giocatore{
 
 //Enemies
 
-struct Enemy {
+struct Nemico {
     
-    int maxHp;
-    int currentHp;
-    int atk;
-    int def;
+    int saluteMax;
+    int saluteCorrente;
+    int attacco;
+    int difesa;
 };

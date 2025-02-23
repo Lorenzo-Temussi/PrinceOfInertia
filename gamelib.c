@@ -783,13 +783,11 @@ int* semePtr = &seme;
 
     static int generaRandomNemico() {
         int temp = rand()%100;
-        if (temp <= 75){
+        if (temp < 25){
             if (rand()%100 < 60) {
-                printf("Una guardia ti guardia in cagnesco\n");
-                return 1;
+                return SCHELETRO;
             } else {
-                printf("Uno scheltro suona le proprie costole come uno xilofono\n");
-                return 2;
+                return GUARDIA;
             }
         }
             return 0;
@@ -806,7 +804,40 @@ int* semePtr = &seme;
     
     // Blocco Combatti
 
-        static void vinci(Giocatore* giocatore) {
+        static Nemico* inizializzaNemico(int indice) {
+            Nemico* temp = (Nemico*)malloc(sizeof(Nemico));
+
+            switch(indice) {
+                case SCHELETRO:
+                    temp->saluteMax = 1;
+                    temp->saluteCorrente = 1;
+                    temp->attacco = 1;
+                    temp->difesa = 1;
+                    printf("Uno scheletro si avvicina scheletrando!\n");
+                    break;
+                case GUARDIA: 
+                    temp->saluteMax = 2;
+                    temp->saluteCorrente = 2;
+                    temp->attacco = 2;
+                    temp->difesa = 2;
+                    printf("Una guardia ti guardia in cagnesco!\n");
+                    break;
+                case JAFFAR: 
+                    temp->saluteMax = 3;
+                    temp->saluteCorrente = 3;
+                    temp->attacco = 3;
+                    temp->difesa = 2;
+                    printf("Il cattivissimo Jaffar e il suo pappagallo Iago"
+                    ", doppiato da Gilbert Gottfried, ti sbarrano la strada!\n");
+                    break;
+                default: 
+                    printf("In questa stanza non sembra esserci nessuno\n");
+                    return NULL;
+            }
+            return temp;
+        }
+
+        static void vinciCombattimento(Giocatore* giocatore, Nemico** nemico) {
             printf("vinci called.\n");
             if(giocatore->saluteCorrente <= giocatore->saluteMax) {
                 giocatore->saluteCorrente++;
@@ -814,11 +845,20 @@ int* semePtr = &seme;
             } else  {
             printf("Vittoria perfetta!");
             }
+            
+            free(*nemico);
+            *nemico = NULL;
+            printf("%p nemico vivo", nemico); //TODO nemico non diventa NULL in modo consistente
+            return;
         } 
         
-        static void combatti() {
+        static void perdiCombattimento(Giocatore* giocatore) {
+            printf("Sei morto!\n");
+        }
+
+        static void combatti(Giocatore* giocatore, Nemico* nemico) {
             printf("combatti called.\n"); 
-            while(1) {
+            while(giocatore->saluteCorrente >= 0) { //TODO
                 int choice = 0;
                 printf("scegli un'azione pisé:\n1) Lotta!\n2) Vinci\n3) Scappa\n");
                 if (scanf("%d", &choice) == 1) { 
@@ -828,8 +868,12 @@ int* semePtr = &seme;
                             break;
                         case 2: 
                             printf("Sconfiggi l'avversario!\n");
-                            vinci(giocatoreCorrente);
-                            break;
+                            vinciCombattimento(giocatore, &nemico);
+                            return;
+                        case 3:
+                            printf("Le tue forze svaniscono e ritorni alle ombre...\n");
+                            perdiCombattimento(giocatore);
+                            return;
                         default: 
                             printf("Opzione non valida.\n");
                             break;
@@ -859,8 +903,14 @@ int* semePtr = &seme;
         printf("cercaPortaSegreta called.\n");
     }
 
-    static void passaTurno() {
-        printf("passaTurno called.\n");
+    static int passaTurno(Nemico* nemico) {
+        if(nemico != NULL) {
+            printf("Non puoi passare il turno se un nemico ti incalza.\n");
+            return 0;
+        } else {
+            printf("Giocatore passa il turno!\n");
+            return 1;
+        }
     }
 
     static void giocaTurno(Giocatore* giocatore) {
@@ -868,6 +918,7 @@ int* semePtr = &seme;
         int choice;
         int numAvanza = 1;
         int nemicoPresente = 0;
+        Nemico* nemico = NULL;
 
         while(1) {
 
@@ -882,13 +933,13 @@ int* semePtr = &seme;
                             numAvanza = 0;
                             avanza(giocatore);
                             innescaTrabocchetto(giocatore, giocatore->posizione);
-                            nemicoPresente = generaRandomNemico();
+                            nemico = inizializzaNemico(generaRandomNemico());
                         } else {
                             printf("Hai finito i piedi.\n");
                         }
                         break;
                     case 2: 
-                        combatti();
+                        combatti(giocatore, nemico);
                         break;
                     case 3:
                         scappa();
@@ -906,8 +957,12 @@ int* semePtr = &seme;
                         cercaPortaSegreta();
                         break;
                     case 8: 
-                        passaTurno();
-                        return;
+                        if (passaTurno(nemico)) {
+                            return;
+                        } else {
+                            break;
+                        }
+                        
                     default: 
                         printf("Opzione non valida.\n");
                         break;
