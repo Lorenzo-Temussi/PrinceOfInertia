@@ -73,6 +73,9 @@ static void prendiTesoro();
 static void cercaPortaSegreta();
 static void passaTurno();
 
+static void innescaTrabocchetto(Giocatore* giocatore, Stanza* stanza);
+static int generaRandomNemico();
+
 // Ipse
 static void giocaTurno(Giocatore* giocatore);
 

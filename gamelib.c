@@ -754,35 +754,54 @@ int* semePtr = &seme;
         return;
     }
         
-    static void avanza(Giocatore* giocatore) {
-        int indice = 0;
-        int scelta = -1;
-        
-        
-        while(1) {
+    static void innescaTrabocchetto(Giocatore* giocatore, Stanza* stanza) {
+        switch (stanza->tipoTrabocchetto) {
+            case 0:
+                printf("La stanza non contiene trappole, traboccheti, botole o cazzi analoghi.\n");
+                break;
+            case 1:
+                printf("Un pianoforte cade dall'alto sulla testa di %s, spaccandone varie ossa\n", giocatore->nome);
 
-            printf("Scegli una direzione:\n");
+                break;
+            case 2:
+                printf("Numerose lame vengono lanciate da apposite fessure nei muri, e si conficcano nelle carni di %s\n", giocatore->nome);
 
-            for(indice = 0; indice < 4; indice++) {
-                if(giocatore->posizione->porte[indice] != NULL) {
-                
-                printf(" %d) %s: ", indice, giocatore->posizione->direzionePorte[indice]);
-                stampaTipoStanza(giocatore->posizione->porte[indice]);
-                }
-                printf("\n");
-            }            
+                break;
+            case 3:
+                printf("L'ignaro/a %s, scivola sul pavimento saponatissimo e sbatte lo zigomo su un tavolo\n", giocatore->nome);
 
-            if(scanf("%d", &scelta) && giocatore->posizione->porte[scelta]) {
-                printf("%s si muove verso ", giocatore->nome);
-                stampaTipoStanza(giocatore->posizione->porte[scelta]);
-                giocatore->posizione = giocatore->posizione->porte[scelta];
-                return;
-            } else {
-                printf("input incorretto");
-            }
-        
+                break;
+            case 4:
+                printf("Il pavimento si apre e %s cade in una botola piena di pezzi lego\n", giocatore->nome);
+
+                break;
+            default:
+                printf("Non so come hai fatto ma sei riuscito a far buggare una variabile.\n");
+                break;
         }
-        printf("avanza called.\n");
+    }
+
+    static int generaRandomNemico() {
+        int temp = rand()%100;
+        if (temp <= 75){
+            if (rand()%100 < 60) {
+                printf("Una guardia ti guardia in cagnesco\n");
+                return 1;
+            } else {
+                printf("Uno scheltro suona le proprie costole come uno xilofono\n");
+                return 2;
+            }
+        }
+            return 0;
+
+    }
+
+    static void avanza(Giocatore* giocatore) {
+        
+        printf("%s si muove verso ", giocatore->nome);
+        stampaTipoStanza(giocatore->posizione->successiva);
+
+        giocatore->posizione = giocatore->posizione->successiva;
     }
     
     // Blocco Combatti
@@ -848,6 +867,7 @@ int* semePtr = &seme;
         
         int choice;
         int numAvanza = 1;
+        int nemicoPresente = 0;
 
         while(1) {
 
@@ -861,6 +881,8 @@ int* semePtr = &seme;
                             printf("%d\n", numAvanza);
                             numAvanza = 0;
                             avanza(giocatore);
+                            innescaTrabocchetto(giocatore, giocatore->posizione);
+                            nemicoPresente = generaRandomNemico();
                         } else {
                             printf("Hai finito i piedi.\n");
                         }
