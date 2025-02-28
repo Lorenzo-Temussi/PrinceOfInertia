@@ -68,13 +68,13 @@ static int ottieniNumeroGiocatori();
 // Gioca_Turno
 
 static void avanza(Giocatore* giocatore);
-static void combatti(Giocatore* giocatore, Nemico* nemico);
-static void vinciCombattimento(Giocatore* giocatore, Nemico** nemico);
+static void combatti(Giocatore* giocatore, int nemico);
+static void vinciCombattimento(Giocatore* giocatore, int nemico);
 static void perdiCombattimento(Giocatore* giocatore);
 static void scappa();
 static void prendiTesoro();
 static void cercaPortaSegreta();
-static int passaTurno(Nemico* nemico);
+static int passaTurno(int nemico);
 
 static void innescaTrabocchetto(Giocatore* giocatore, Stanza* stanza);
 static int generaRandomNemico();
