@@ -13,6 +13,8 @@ Stanza* ptrUltimaStanza = NULL;
 Giocatore* ptrPrimoGiocatore = NULL;
 Giocatore* giocatoreCorrente = NULL;
 
+int JaffarSconfitto = 0;
+
 int seme = 0;
 int* semePtr = &seme;
 
@@ -583,26 +585,20 @@ int* semePtr = &seme;
 
 // SEZIONE 2 - GIOCA
 
-    static int haiSconfittoJaffar() {
-        return 0;
-    }
-
     static int partitaConclusa() {
         Giocatore* temp = ptrPrimoGiocatore;
-            if (!temp) {
+        if (!temp) {
             printf("Errore: 0 giocatori nella lista\n");
             return -1;
         } 
 
-        if(haiSconfittoJaffar()) {
-            return 1;
-        }
+        
         for(int i = 0; i < ottieniNumeroGiocatori(); i++) {
             if (ptrGiocatoreNumero(i)->saluteCorrente != 0) {
                 return 0;
             }
         }
-        return 1;
+        return JaffarSconfitto;
     }
 
     static int ottieniNumeroGiocatori() {
@@ -750,6 +746,9 @@ int* semePtr = &seme;
             strcpy(giocatore->nome, string);  // Copy the string into the allocated memory
         
         giocatore->posizione = ptrPrimaStanza;
+
+        giocatore->attacco = 2;
+        giocatore->difesa = 2;
         
         return;
     }
@@ -881,6 +880,10 @@ int* semePtr = &seme;
 
         static void vinciCombattimento(Giocatore* giocatore, int nemico) {
             printf("vinci called.\n");
+            if(nemico == 3) {
+                JaffarSconfitto = 1;
+            }
+
             if(giocatore->saluteCorrente < giocatore->saluteMax) {
                 giocatore->saluteCorrente++;
                 printf("Ti riposi dopo la battaglia, e ti senti più in salute.\n");
@@ -958,12 +961,39 @@ int* semePtr = &seme;
 
     // fine blocco
 
-    static void scappa() {
-        printf("scappa called.\n");
+    static void scappa(Giocatore* giocatore) {
+        if (giocatore->numFuga > 0) {
+            giocatore->numFuga --;
+        } else {
+            printf("Non riesci a correre ancora, devi lottare!\n");
+        }
+        for (int i = 0; i <= 3; i++) {
+            if (giocatore->posizione->porte[i] && giocatore->posizione->porte[i] != giocatore->posizione->successiva) {
+                giocatore->posizione = giocatore->posizione->porte[i];
+                break;
+            }
+        }
+        printf("Riesci a far perdere le tue tracce tornando nella stanza precedente.\n"
+        "Il nemico insegue una falsa pista nelle profondità del palazzo.\n");
+        return;
+
     }
 
     static void stampaGiocatore(Giocatore* giocatore) {
-    printf("stampaGiocatore called.\n");
+        printf("***************************\n");
+        printf("NOME GIOCATORE: %s\n\n", giocatore->nome);
+
+        printf("CLASSE: %s\n", giocatore->classe?"Doppelganger":"Principe");
+
+        printf("SALUTE: %d/%d\n", giocatore->saluteCorrente, giocatore->saluteMax);
+
+        printf("ATTACCO: %d\n", giocatore->attacco);
+        printf("DIFESA: %d\n", giocatore->difesa);
+
+        printf("%s può ancora fuggire da %d nemici e schivare %d trabocchetti.\n", giocatore->nome, 
+        giocatore->numFuga, giocatore->numEvadiTrabocchetto);
+        printf("***************************\n");
+        return;
     }
 
 
@@ -1026,8 +1056,7 @@ int* semePtr = &seme;
         
         int choice;
         int numAvanza = 1;
-        int nemicoPresente = 0;
-        int indiceNemico = 0; // qui rendere nemico un tipoNemico int e aggiustare il codeice di conseguenza
+        int indiceNemico = 0; 
 
         while(giocatore->saluteCorrente > 0) {
 
@@ -1042,10 +1071,17 @@ int* semePtr = &seme;
                             numAvanza = 0;
                             avanza(giocatore);
                             innescaTrabocchetto(giocatore, giocatore->posizione);
+                            if(giocatore->posizione->successiva == NULL) {
+                                indiceNemico = 3;
+                                break;
+                            }
                             indiceNemico = (generaRandomNemico());
                         } else {
                             printf("Hai finito i piedi.\n");
                         }
+
+                        
+
                         break;
                     case 2: 
                         if(!indiceNemico) {
@@ -1056,7 +1092,12 @@ int* semePtr = &seme;
                         indiceNemico = 0;
                         break;
                     case 3:
-                        scappa();
+                        if(!indiceNemico) {
+                            printf("Una paura inspiegabile ti filtra nelle ossa, vuoi fuggire!\n"
+                            "Ma ti riprendi in tempo: nella stanza con te non c'è nessuno...\n");
+                            break;
+                        }
+                        scappa(giocatore);
                         indiceNemico = 0;
                         break;
                     case 4: 
@@ -1066,7 +1107,11 @@ int* semePtr = &seme;
                         stampaStanza(giocatore->posizione, 0);
                         break;
                     case 6:
-                        prendiTesoro(giocatore);
+                    if (passaTurno(indiceNemico)) {
+                            prendiTesoro(giocatore);
+                        } else {
+                            printf("Non è il momento di saccheggiare il palazzo!\n");
+                        }
                         break;
                     case 7: 
                         cercaPortaSegreta();
