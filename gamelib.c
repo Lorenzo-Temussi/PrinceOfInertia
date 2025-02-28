@@ -798,7 +798,11 @@ int* semePtr = &seme;
     }
 
     static void avanza(Giocatore* giocatore) {
-        
+        if(!giocatore->posizione->successiva) {
+            printf("Debug: questa è l'ultima stanza, non è possibile avanzare ancora.\n");
+            return;
+        }
+
         printf("%s si muove verso ", giocatore->nome);
         stampaTipoStanza(giocatore->posizione->successiva);
 
@@ -806,6 +810,41 @@ int* semePtr = &seme;
     }
     
     // Blocco Combatti
+
+        static int tiraDado () {
+            return rand()%6;
+        }
+
+        static int valutaDado (int risultato) {
+            if (risultato == 6) {
+                return 2;
+            }
+            if (risultato >= 4) {
+                return 1;
+            }
+            return 0;
+        }
+
+        static int infliggiDanni(int attacco, int difesa) {
+            int attaccotemp = 0; 
+            int difesatemp = 0;
+
+            for (int i= 0; i <= attacco; i++) {
+                attaccotemp += valutaDado(tiraDado());
+            }
+
+            for (int i = 0; i <= difesa; i++) {
+                difesatemp += valutaDado(tiraDado());
+            }
+
+            if((attaccotemp - difesatemp) <= 0) {
+                printf("Mancato! L'attacco non connette, e non infligge danni!\n");
+                return 0;
+            } else {
+                printf("Attacco a segno! Infligge %d danni!\n", attaccotemp - difesatemp);
+                return (attaccotemp - difesatemp);
+            }
+        }
 
         static Nemico* inizializzaNemico(int indice) {
             Nemico* temp = (Nemico*)malloc(sizeof(Nemico));
@@ -852,8 +891,10 @@ int* semePtr = &seme;
             return;
         } 
         
-        static void perdiCombattimento(Giocatore* giocatore) {
+        static void muori (Giocatore* giocatore) {
             printf("Sei morto!\n");
+            giocatore->saluteCorrente = 0;
+            return;
         }
 
         static void combatti(Giocatore* giocatore, int indiceNemico) {
@@ -865,7 +906,39 @@ int* semePtr = &seme;
                 if (scanf("%d", &choice) == 1) { 
                     switch (choice) {
                         case 1: 
-                            printf("Lotti per un turno intero!\n");
+                            if (rand()%2) {
+                                nemico->saluteCorrente -= infliggiDanni(giocatore->attacco, nemico->difesa);
+                                printf("(Debug: salute rimanente nemico = %d)", nemico->saluteCorrente);
+                                if(nemico->saluteCorrente <= 0) {
+                                    vinciCombattimento(giocatore, indiceNemico);
+                                    return;
+                                }
+
+                                giocatore->saluteCorrente -= infliggiDanni(nemico->attacco, giocatore->difesa);
+                                printf("(Debug: salute rimanente player = %d)", giocatore->saluteCorrente);
+
+                                if (giocatore->saluteCorrente <= 0) {
+                                    muori(giocatore);
+                                    return;
+                                }
+                            } else {
+                                giocatore->saluteCorrente -= infliggiDanni(nemico->attacco, giocatore->difesa);
+                                printf("(Debug: salute rimanente player = %d)", giocatore->saluteCorrente);
+
+                                if (giocatore->saluteCorrente <= 0) {
+                                    muori(giocatore);
+                                    return;
+                                }
+
+                                nemico->saluteCorrente -= infliggiDanni(giocatore->attacco, nemico->difesa);
+                                printf("(Debug: salute rimanente nemico = %d)", nemico->saluteCorrente);
+
+                                if(nemico->saluteCorrente <= 0) {
+                                    vinciCombattimento(giocatore, indiceNemico);
+                                    return;
+                                }
+                                
+                            }
                             break;
                         case 2: 
                             printf("Sconfiggi l'avversario!\n");
@@ -873,7 +946,7 @@ int* semePtr = &seme;
                             return;
                         case 3:
                             printf("Le tue forze svaniscono e ritorni alle ombre...\n");
-                            perdiCombattimento(giocatore);
+                            muori(giocatore);
                             return;
                         default: 
                             printf("Opzione non valida.\n");
@@ -896,8 +969,43 @@ int* semePtr = &seme;
 
     // stampaStanza definita in precedenza
 
-    static void prendiTesoro() {
-        printf("prendiTesoro called.\n");
+    static void prendiTesoro(Giocatore* giocatore) {
+        switch(giocatore->posizione->tipoTesoro) {
+            case NESSUN_TESORO: 
+                printf("La stanza non contiene un tesoro.\n");
+                return;
+            case VELENO:
+                printf("Bevi il contenuto dell'ampolla.\n Un dolore terribile ti scuote da testa a piedi. Perdi 1 PS.\n");
+                giocatore->saluteCorrente -= 1;
+                if (giocatore->saluteCorrente <= 0) {
+                    muori(giocatore);
+                }
+                break;
+            case GUARIGIONE:
+                printf("Bevi il contenuto dell'ampolla.\n Ti senti meglio. Recuperi 1 PS.\n");
+                if(giocatore->saluteCorrente < giocatore->saluteMax) {
+                    giocatore->saluteCorrente += 1;
+                }
+                break;
+            case AUMENTA_HP:
+                printf("Bevi il contenuto dell'ampolla.\n Ti senti invincibile. PS massimi aumentati!\n");
+                giocatore->saluteMax += 1;
+                giocatore->saluteCorrente += 1;
+                break;
+            case SPADA_TAGLIENTE:
+                printf("Trovi un'arma più efficace di quella attuale! Guadagni 1 ATK.\n");
+                giocatore->attacco += 1;
+                break;
+            case SCUDO:
+                printf("Trovi uno scudo di fattura migliore di quello che stai brandendo! Guadagni 1 DEF.\n");
+                giocatore->difesa += 1;
+                break;
+            default:
+                printf("Se leggi questo hai fatto un macello.\n");
+        }
+        printf("La stanza non contiene più tesori.\n");
+        giocatore->posizione->tipoTesoro = NESSUN_TESORO;
+
     }
 
     static void cercaPortaSegreta() {
@@ -921,7 +1029,7 @@ int* semePtr = &seme;
         int nemicoPresente = 0;
         int indiceNemico = 0; // qui rendere nemico un tipoNemico int e aggiustare il codeice di conseguenza
 
-        while(1) {
+        while(giocatore->saluteCorrente > 0) {
 
             printf("scegli un'azione %s:\n 1) Avanza!\n 2) Combatti\n 3) Scappa\n"
             " 4) Stampa Giocatore\n 5) Stampa Zona\n 6) Prendi Tesoro\n"
@@ -940,6 +1048,10 @@ int* semePtr = &seme;
                         }
                         break;
                     case 2: 
+                        if(!indiceNemico) {
+                            printf("Assumi una posizione di combattimento, ma non ci sono nemici.\n");
+                            break;
+                        }
                         combatti(giocatore, indiceNemico);
                         indiceNemico = 0;
                         break;
@@ -954,7 +1066,7 @@ int* semePtr = &seme;
                         stampaStanza(giocatore->posizione, 0);
                         break;
                     case 6:
-                        prendiTesoro();
+                        prendiTesoro(giocatore);
                         break;
                     case 7: 
                         cercaPortaSegreta();

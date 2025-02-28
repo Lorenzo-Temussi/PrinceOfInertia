@@ -72,7 +72,7 @@ static void combatti(Giocatore* giocatore, int nemico);
 static void vinciCombattimento(Giocatore* giocatore, int nemico);
 static void perdiCombattimento(Giocatore* giocatore);
 static void scappa();
-static void prendiTesoro();
+static void prendiTesoro(Giocatore* giocatore);
 static void cercaPortaSegreta();
 static int passaTurno(int nemico);
 
