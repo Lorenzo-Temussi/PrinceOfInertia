@@ -585,8 +585,14 @@ int* semePtr = &seme;
 
 // SEZIONE 2 - GIOCA
 
-    static int partitaConclusa() {
+    static int partitaConclusa(Giocatore* giocatore) {
+        printf("Jaffar vola fuori dalla finestra, il pappagallo viene cotto in 6 pezzi di"
+        " chicken nuggets dall'impatto dell'ultimo colpo e la principessa spezza le catene tramite il"
+        " potere dell'amiciza per saltare fra le braccia di %s.\n", giocatore->nome);
+        return 1;
+        
         Giocatore* temp = ptrPrimoGiocatore;
+        
         if (!temp) {
             printf("Errore: 0 giocatori nella lista\n");
             return -1;
@@ -598,7 +604,7 @@ int* semePtr = &seme;
                 return 0;
             }
         }
-        return JaffarSconfitto;
+        return 1;
     }
 
     static int ottieniNumeroGiocatori() {
@@ -677,8 +683,8 @@ int* semePtr = &seme;
         giocatore->difesa = 1;
         giocatore->nome = "Giocatore X";
         giocatore->posizione = NULL;
-        giocatore->saluteMax = 3;
-        giocatore->saluteCorrente = 3;
+        giocatore->saluteMax = 100;
+        giocatore->saluteCorrente = 100;
         giocatore->numFuga = 2;
         giocatore->numEvadiTrabocchetto = 0;
 
@@ -958,11 +964,11 @@ int* semePtr = &seme;
                                 
                             }
                             break;
-                        case 2: 
+                        case 2: //ToDO delete
                             printf("Sconfiggi l'avversario!\n");
                             vinciCombattimento(giocatore, indiceNemico);
                             return;
-                        case 3:
+                        case 3: //Todo delete
                             printf("Le tue forze svaniscono e ritorni alle ombre...\n");
                             muori(giocatore);
                             return;
@@ -1150,6 +1156,10 @@ int* semePtr = &seme;
                             break;
                         }
                         combatti(giocatore, indiceNemico);
+                        if(indiceNemico == 3 && giocatore->saluteCorrente > 0) {
+                            JaffarSconfitto = 1;
+                            return;
+                        }
                         indiceNemico = 0;
                         break;
                     case 3:
@@ -1218,7 +1228,7 @@ int* semePtr = &seme;
         }
 
 
-        while (partitaConclusa() == 0) {                
+        while (JaffarSconfitto == 0) {                
             int temp;
             // genera un giocatore non turnato
             for(int i = 0; i < numGiocatori; i++) {
