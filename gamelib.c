@@ -754,29 +754,39 @@ int* semePtr = &seme;
     }
         
     static void innescaTrabocchetto(Giocatore* giocatore, Stanza* stanza) {
+        if ((giocatore->numEvadiTrabocchetto > 0) && (stanza->tipoTrabocchetto > 0)) {
+            printf("I sensi di persiano di %s lo avvisano che il pericolo è imminente!\n"
+            "Con un salto, una schivata e un ruzzolone, %s evade la trappola in questa stanza!",
+            giocatore->nome, giocatore->nome);
+            giocatore->numEvadiTrabocchetto --;
+            return;
+        }
         switch (stanza->tipoTrabocchetto) {
             case 0:
                 printf("La stanza non contiene trappole, traboccheti, botole o cazzi analoghi.\n");
                 break;
             case 1:
                 printf("Un pianoforte cade dall'alto sulla testa di %s, spaccandone varie ossa\n", giocatore->nome);
-
+                giocatore->saluteCorrente -=2;
                 break;
             case 2:
                 printf("Numerose lame vengono lanciate da apposite fessure nei muri, e si conficcano nelle carni di %s\n", giocatore->nome);
-
+                giocatore->saluteCorrente -= 1;
                 break;
             case 3:
                 printf("L'ignaro/a %s, scivola sul pavimento saponatissimo e sbatte lo zigomo su un tavolo\n", giocatore->nome);
-
+                giocatore->difesa -= 1;
                 break;
             case 4:
                 printf("Il pavimento si apre e %s cade in una botola piena di pezzi lego\n", giocatore->nome);
-
+                giocatore->attacco -= 1;
                 break;
             default:
                 printf("Non so come hai fatto ma sei riuscito a far buggare una variabile.\n");
                 break;
+        }
+        if (giocatore->saluteCorrente <= 0) {
+            muori(giocatore);
         }
     }
 
@@ -910,31 +920,36 @@ int* semePtr = &seme;
                     switch (choice) {
                         case 1: 
                             if (rand()%2) {
+                                printf("%s attacca! ", giocatore->nome);
                                 nemico->saluteCorrente -= infliggiDanni(giocatore->attacco, nemico->difesa);
-                                printf("(Debug: salute rimanente nemico = %d)", nemico->saluteCorrente);
+                                printf("(Debug: salute rimanente nemico = %d)\n", nemico->saluteCorrente);
+                                
                                 if(nemico->saluteCorrente <= 0) {
                                     vinciCombattimento(giocatore, indiceNemico);
                                     return;
                                 }
 
+                                printf("Il nemico attacca! ");
                                 giocatore->saluteCorrente -= infliggiDanni(nemico->attacco, giocatore->difesa);
-                                printf("(Debug: salute rimanente player = %d)", giocatore->saluteCorrente);
-
+                                printf("(Debug: salute rimanente player = %d)\n", giocatore->saluteCorrente);
+                                
                                 if (giocatore->saluteCorrente <= 0) {
                                     muori(giocatore);
                                     return;
                                 }
                             } else {
+                                printf("Il nemico attacca! ");
                                 giocatore->saluteCorrente -= infliggiDanni(nemico->attacco, giocatore->difesa);
-                                printf("(Debug: salute rimanente player = %d)", giocatore->saluteCorrente);
+                                printf("(Debug: salute rimanente player = %d)\n", giocatore->saluteCorrente);
 
                                 if (giocatore->saluteCorrente <= 0) {
                                     muori(giocatore);
                                     return;
                                 }
 
+                                printf("%s attacca! ", giocatore->nome);
                                 nemico->saluteCorrente -= infliggiDanni(giocatore->attacco, nemico->difesa);
-                                printf("(Debug: salute rimanente nemico = %d)", nemico->saluteCorrente);
+                                printf("(Debug: salute rimanente nemico = %d)\n", nemico->saluteCorrente);
 
                                 if(nemico->saluteCorrente <= 0) {
                                     vinciCombattimento(giocatore, indiceNemico);
@@ -1038,18 +1053,62 @@ int* semePtr = &seme;
 
     }
 
-    static void cercaPortaSegreta() {
-        printf("cercaPortaSegreta called.\n");
+    static Stanza* creaStanzaSegreta() {
+        return creaStanza(generaRandomStanza(), generaRandomTrabocchetto(), generaRandomTesoro());
     }
 
-    static int passaTurno(int nemico) {
-        if(nemico != 0) {
-            printf("Non puoi passare il turno se un nemico ti incalza.\n");
-            return 0;
-        } else {
-            printf("Giocatore passa il turno!\n");
-            return 1;
+    static int cercaPortaSegreta(Giocatore* giocatore, int stanzeTrovate) {
+        int scan = -1;
+        while(scan < 0 || scan > 3) {
+            for (int i = 0; i <= 3; i++) {
+                if (giocatore->posizione->porte[i] != giocatore->posizione->successiva) {
+                    printf(" %d) Cerca stanza segreta a %s.", i, giocatore->posizione->direzionePorte[i]);
+                }
+            }
+
+            if (scanf("%d", &scan) == 1 && scan <= 3 && scan >= 0) {
+                break;
+            }
         }
+
+        
+
+        switch (stanzeTrovate) {
+            case 0:
+                if (!(rand()%100 < 33)) {
+                    printf("Dopo un'attenta investigazione, concludi che non c'è alcuna stanza segreta verso %s.\n", giocatore->posizione->direzionePorte[scan]);
+                    return scan;
+                }
+                break;
+            case 1:
+                if (!(rand()%100 < 20)) {
+                    printf("Dopo un'attenta investigazione, concludi che non c'è alcuna stanza segreta verso %s.\n", giocatore->posizione->direzionePorte[scan]);
+                    return scan;
+                }
+                break;
+            case 2:
+                if (!(rand()%100 < 15)) {
+                    printf("Dopo un'attenta investigazione, concludi che non c'è alcuna stanza segreta verso %s.\n", giocatore->posizione->direzionePorte[scan]);
+                    return scan;
+                }
+                break;
+            default:
+                printf("Non ci sono altre stanze segrete...\n");
+                return -1;
+        }
+
+        //TODO this doesnt run for unknown reasons
+        Stanza* stanzaSegreta = creaStanzaSegreta();
+        Stanza* prev = giocatore->posizione;
+
+        printf("%s esplora la stanza segreta.\n", giocatore->nome);
+        giocatore->posizione = stanzaSegreta;
+        innescaTrabocchetto(giocatore,  stanzaSegreta);
+        prendiTesoro(giocatore);
+
+        giocatore->posizione = prev;
+        return scan;
+
     }
 
     static void giocaTurno(Giocatore* giocatore) {
@@ -1057,6 +1116,9 @@ int* semePtr = &seme;
         int choice;
         int numAvanza = 1;
         int indiceNemico = 0; 
+
+        int stanzeTrovate = 0;
+        int stanzeCercate[] = {-1, -1, -1, -1};
 
         while(giocatore->saluteCorrente > 0) {
 
@@ -1072,6 +1134,8 @@ int* semePtr = &seme;
                             avanza(giocatore);
                             innescaTrabocchetto(giocatore, giocatore->posizione);
                             if(giocatore->posizione->successiva == NULL) {
+                                printf("Nella stanza è presente la principessa, incatenata al muro!\n"
+                                "%s si avvicina per liberarla, ma dalle ombre una risata pretenziosa annuncia la presenza di qualcuno...\n", giocatore->nome);
                                 indiceNemico = 3;
                                 break;
                             }
@@ -1079,9 +1143,6 @@ int* semePtr = &seme;
                         } else {
                             printf("Hai finito i piedi.\n");
                         }
-
-                        
-
                         break;
                     case 2: 
                         if(!indiceNemico) {
@@ -1107,22 +1168,38 @@ int* semePtr = &seme;
                         stampaStanza(giocatore->posizione, 0);
                         break;
                     case 6:
-                    if (passaTurno(indiceNemico)) {
+                        if (!indiceNemico) {
                             prendiTesoro(giocatore);
                         } else {
                             printf("Non è il momento di saccheggiare il palazzo!\n");
                         }
                         break;
                     case 7: 
-                        cercaPortaSegreta();
+                        int temp;
+                        if (numAvanza <= 0) {
+                            printf("Non puoi trovare stanze segrete senza i piedi!\n");
+                            break;
+                            }
+                        temp = cercaPortaSegreta(giocatore, stanzeTrovate);
+                        if (temp < 0 || temp >= 4) {
+                            break;
+                        } else {
+                            numAvanza --;
+                            for(int i = 0; i <= 4; i++) {
+                                if (stanzeCercate[i] == -1) {
+                                    stanzeCercate[i] = temp;
+                                    break;
+                                }
+                            }
+                        }
                         break;
                     case 8: 
-                        if (passaTurno(indiceNemico)) {
+                        if (!indiceNemico) {
+                            printf("%s conclude il suo turno.\n", giocatore->nome);
                             return;
                         } else {
                             break;
                         }
-                        
                     default: 
                         printf("Opzione non valida.\n");
                         break;

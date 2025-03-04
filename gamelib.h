@@ -70,10 +70,10 @@ static int ottieniNumeroGiocatori();
 static void avanza(Giocatore* giocatore);
 static void combatti(Giocatore* giocatore, int nemico);
 static void vinciCombattimento(Giocatore* giocatore, int nemico);
-static void perdiCombattimento(Giocatore* giocatore);
+static void muori(Giocatore* giocatore);
 static void scappa(Giocatore* giocatore);
 static void prendiTesoro(Giocatore* giocatore);
-static void cercaPortaSegreta();
+static int cercaPortaSegreta(Giocatore* giocatore, int stanzeTrovate);
 static int passaTurno(int nemico);
 
 static void innescaTrabocchetto(Giocatore* giocatore, Stanza* stanza);
