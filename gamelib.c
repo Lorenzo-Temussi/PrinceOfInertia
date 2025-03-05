@@ -1184,7 +1184,8 @@ int* semePtr = &seme;
                             printf("Non è il momento di saccheggiare il palazzo!\n");
                         }
                         break;
-                    case 7: 
+                    case 7:
+                    {
                         int temp;
                         if (numAvanza <= 0) {
                             printf("Non puoi trovare stanze segrete senza i piedi!\n");
@@ -1203,6 +1204,7 @@ int* semePtr = &seme;
                             }
                         }
                         break;
+                    }
                     case 8: 
                         if (!indiceNemico) {
                             printf("%s conclude il suo turno.\n", giocatore->nome);
