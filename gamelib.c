@@ -592,22 +592,7 @@ int* semePtr = &seme;
         while (1);
     }
 
-
-
 // SEZIONE 2 - GIOCA
-
-
-    /*static int ottieniNumeroGiocatori() {
-        Giocatore* temp = ptrPrimoGiocatore;
-        int numero = 0;
-
-        while(temp && temp->successivo) {
-            temp = temp->successivo;
-            numero++;
-        }
-
-        return numero;
-    }*/ //TODO REDO
 
     static int inserisciNumeroGiocatori() {
         int playerNum;
@@ -626,43 +611,8 @@ int* semePtr = &seme;
             while (getchar() != '\n');
         } while(!(playerNum <= 4 && playerNum >= 1));
 
-        /*Giocatore* listaGiocatori [playerNum];
-        for (int i = 0; i < playerNum; i++) {
-            listaGiocatori[i] = creaGiocatore();
-            inserisciGiocatore(listaGiocatori[i]);
-
-        }
-
-        for (int i = 0; i < playerNum; i++) {
-            popolaGiocatore(ptrGiocatoreNumero(i));
-        }
-        */ // TODO move to
         return playerNum;
     }
-
-    /*static void inserisciGiocatore(Giocatore* giocatore) {
-        Giocatore* temp = ptrPrimoGiocatore;
-
-        if(temp == NULL) {
-            ptrPrimoGiocatore = giocatore;
-            return;
-        }
-
-        while(temp->successivo) {
-            temp = temp->successivo;
-        }
-        temp->successivo = giocatore;
-    }*/ //TODO REMOVE
-
-    /*static Giocatore* ptrGiocatoreNumero(int indice) {
-        Giocatore* temp = ptrPrimoGiocatore;
-
-        while(indice > 0) {
-            temp = temp->successivo;
-            indice--;
-        }
-        return temp;
-    }*/ // TODO REMOVE
 
     static Giocatore* creaGiocatore() {
         //printf("Crea giocatore chiamata\n");
@@ -891,7 +841,7 @@ int* semePtr = &seme;
         static void combatti(Giocatore* giocatore, int indiceNemico) {
             printf("combatti called.\n"); 
             Nemico* nemico = inizializzaNemico(indiceNemico);
-            while(giocatore->saluteCorrente > 0) { //TODO
+            while(giocatore->saluteCorrente > 0) { 
                 if (rand()%2) {
                     printf("%s attacca! ", giocatore->nome);
                     nemico->saluteCorrente -= infliggiDanni(giocatore->attacco, nemico->difesa);
