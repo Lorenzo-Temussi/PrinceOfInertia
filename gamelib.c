@@ -10,8 +10,6 @@
 Stanza* ptrPrimaStanza = NULL;
 Stanza* ptrUltimaStanza = NULL;
 
-Giocatore* ptrPrimoGiocatore = NULL; //TODO rimuovi
-Giocatore* giocatoreCorrente = NULL;
 
 int JaffarSconfitto = 0;
 
@@ -143,7 +141,6 @@ int* semePtr = &seme;
         }
         return 0;
     }
-
 
     static int getRoomCount() { //COMPLETE - LL
         int stanzeTotali = 0;
@@ -599,29 +596,8 @@ int* semePtr = &seme;
 
 // SEZIONE 2 - GIOCA
 
-    static int partitaConclusa(Giocatore* giocatore) {
-        printf("Jaffar vola fuori dalla finestra, il pappagallo viene cotto in 6 pezzi di"
-        " chicken nuggets dall'impatto dell'ultimo colpo e la principessa spezza le catene tramite il"
-        " potere dell'amiciza per saltare fra le braccia di %s.\n", giocatore->nome);
-        return 1;
-        
-        Giocatore* temp = ptrPrimoGiocatore;
-        
-        if (!temp) {
-            printf("Errore: 0 giocatori nella lista\n");
-            return -1;
-        } 
 
-        
-        for(int i = 0; i < ottieniNumeroGiocatori(); i++) {
-            if (ptrGiocatoreNumero(i)->saluteCorrente != 0) {
-                return 0;
-            }
-        }
-        return 1;
-    }
-
-    static int ottieniNumeroGiocatori() {
+    /*static int ottieniNumeroGiocatori() {
         Giocatore* temp = ptrPrimoGiocatore;
         int numero = 0;
 
@@ -631,7 +607,7 @@ int* semePtr = &seme;
         }
 
         return numero;
-    }
+    }*/ //TODO REDO
 
     static int inserisciNumeroGiocatori() {
         int playerNum;
@@ -650,7 +626,7 @@ int* semePtr = &seme;
             while (getchar() != '\n');
         } while(!(playerNum <= 4 && playerNum >= 1));
 
-        Giocatore* listaGiocatori [playerNum];
+        /*Giocatore* listaGiocatori [playerNum];
         for (int i = 0; i < playerNum; i++) {
             listaGiocatori[i] = creaGiocatore();
             inserisciGiocatore(listaGiocatori[i]);
@@ -660,10 +636,11 @@ int* semePtr = &seme;
         for (int i = 0; i < playerNum; i++) {
             popolaGiocatore(ptrGiocatoreNumero(i));
         }
+        */ // TODO move to
         return playerNum;
     }
 
-    static void inserisciGiocatore(Giocatore* giocatore) {
+    /*static void inserisciGiocatore(Giocatore* giocatore) {
         Giocatore* temp = ptrPrimoGiocatore;
 
         if(temp == NULL) {
@@ -675,9 +652,9 @@ int* semePtr = &seme;
             temp = temp->successivo;
         }
         temp->successivo = giocatore;
-    }
+    }*/ //TODO REMOVE
 
-    static Giocatore* ptrGiocatoreNumero(int indice) {
+    /*static Giocatore* ptrGiocatoreNumero(int indice) {
         Giocatore* temp = ptrPrimoGiocatore;
 
         while(indice > 0) {
@@ -685,7 +662,7 @@ int* semePtr = &seme;
             indice--;
         }
         return temp;
-    }
+    }*/ // TODO REMOVE
 
     static Giocatore* creaGiocatore() {
         //printf("Crea giocatore chiamata\n");
@@ -708,27 +685,8 @@ int* semePtr = &seme;
         return giocatore;
     }
 
-    static void popolaGiocatore(Giocatore* giocatore) {
+    static Giocatore* popolaGiocatore(Giocatore* giocatore) {
         int temp;
-        Giocatore* tempGiocatore = ptrPrimoGiocatore;
-        int numGiocatori = ottieniNumeroGiocatori();
-
-        while(tempGiocatore != giocatore) {
-            if(tempGiocatore->classe == PRINCIPE) {
-                giocatore->classe = DOPPELGANGER;
-                printf("Almeno 1 principe\n");
-                break;
-            }
-
-            if(tempGiocatore->successivo->successivo == NULL) {
-
-                giocatore->classe = PRINCIPE;
-                break;
-            }
-
-            tempGiocatore = tempGiocatore->successivo;
-        }
-
 
         while(giocatore->classe == -1) {
             printf("Seleziona la classe:\n 0) PRINCIPE\n 1) DOPPELGANGER\n");
@@ -770,7 +728,7 @@ int* semePtr = &seme;
         giocatore->attacco = 2;
         giocatore->difesa = 2;
         
-        return;
+        return giocatore;
     }
         
     static void innescaTrabocchetto(Giocatore* giocatore, Stanza* stanza) {
@@ -1206,6 +1164,7 @@ int* semePtr = &seme;
                             printf("%s conclude il suo turno.\n", giocatore->nome);
                             return;
                         } else {
+                            printf("Un nemico ti sbarra la strada.\n");
                             break;
                         }
                     default: 
@@ -1219,20 +1178,18 @@ int* semePtr = &seme;
     void gioca() {
 
         int numGiocatori = inserisciNumeroGiocatori();  //selezione num. giocatori
-        Giocatore* giocatoriTurnati[numGiocatori];
+        Giocatore* listaGiocatori[numGiocatori];
 
         for(int i = 0; i < numGiocatori; i++) {     // creazione giocatori
-        inserisciGiocatore(creaGiocatore());
+        listaGiocatori[i] = popolaGiocatore(creaGiocatore());
         }
 
 
         while (JaffarSconfitto == 0) {                
-            int temp;
             // genera un giocatore non turnato
             for(int i = 0; i < numGiocatori; i++) {
-                giocaTurno(ptrGiocatoreNumero(i));
-                if (i == numGiocatori) 
-                {i = -1;}
+                giocaTurno(listaGiocatori[i]);
+                if (i == numGiocatori) {i = -1;}
             }
         }
 
@@ -1250,7 +1207,6 @@ int* semePtr = &seme;
     void pausaEsecuzione() {
         printf("Premi Enter per continuare.\n");
         while(getchar() != '\n');
-          
     }
 
     static void mostraPunteggio() {
