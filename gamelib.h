@@ -79,6 +79,10 @@ static int passaTurno(int nemico);
 static void innescaTrabocchetto(Giocatore* giocatore, Stanza* stanza);
 static int generaRandomNemico();
 
+//gameover
+static void mostraPunteggio();
+static void pausaEsecuzione();
+
 // Ipse
 static void giocaTurno(Giocatore* giocatore);
 

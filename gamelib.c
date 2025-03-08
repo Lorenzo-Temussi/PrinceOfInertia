@@ -10,7 +10,7 @@
 Stanza* ptrPrimaStanza = NULL;
 Stanza* ptrUltimaStanza = NULL;
 
-Giocatore* ptrPrimoGiocatore = NULL;
+Giocatore* ptrPrimoGiocatore = NULL; //TODO rimuovi
 Giocatore* giocatoreCorrente = NULL;
 
 int JaffarSconfitto = 0;
@@ -23,6 +23,23 @@ int* semePtr = &seme;
 // Piu altre funzioni di supporto.
 // Le funzioni richiamabili in main.c non devono essere static.
 // Le altre devono essere static (non visibili all'esterno).
+
+    static void riceviInputStringa(char* buffer, int dimensione) {
+        if (fgets(buffer, dimensione, stdin) && !(strchr(buffer, '\n'))) {
+            char c;
+            while((c = getchar()) != '\n' && c != EOF);
+        }
+    }
+
+    static int riceviInputNumerico (int minimo, int massimo) {
+        int temp = -1;
+        char buffer [8];
+        riceviInputStringa(buffer, 8);
+        if(!sscanf(buffer, "%d", &temp)) {
+            return -1;
+        }
+        return temp;
+    }
 
 // SEZIONE 1 - IMPOSTA
 
@@ -63,21 +80,20 @@ int* semePtr = &seme;
 
     static void modificaSemeSelect() {
         while(1) {
-            printf("Modifica seme:\n1) Casuale\n2) Inserisci\n 0) Annulla\n\n");
-            int choice = -1;
-            if (scanf("%d", &choice) == 1) { 
-                switch(choice) {
-                    case 0:
-                        return;
-                    case 1:
-                        generaSeed();
-                        return;
-                    case 2: 
-                        selezionaSeed();
-                        return;
-                    default:
-                        printf("Selezione non valida\n");
-                }
+            printf("Selezione 0, 1 o 2.\n");
+            switch(riceviInputNumerico(0, 2)) {
+                case 0:
+                    printf("Caso 0");
+                    return;
+                case 1:
+                    generaSeed();
+                    return;
+                case 2: 
+                    selezionaSeed();
+                    return;
+                default:
+                    printf("Selezione non valida\n");
+                    break;
             }
         }
     }
@@ -470,8 +486,6 @@ int* semePtr = &seme;
         printf("stanza deletata alla grande!\n");
         return 1;    
     }
-
-
 
     static void cancellaStanzaSelect() {
         if (!getRoomCount()) {
@@ -904,9 +918,9 @@ int* semePtr = &seme;
                 giocatore->saluteCorrente++;
                 printf("Ti riposi dopo la battaglia, e ti senti più in salute.\n");
             } else  {
-            printf("Vittoria perfetta!");
+            printf("Vittoria perfetta!\n");
             }
-            
+            pausaEsecuzione();
             return;
         } 
         
@@ -920,62 +934,44 @@ int* semePtr = &seme;
             printf("combatti called.\n"); 
             Nemico* nemico = inizializzaNemico(indiceNemico);
             while(giocatore->saluteCorrente > 0) { //TODO
-                int choice = 0;
-                printf("scegli un'azione pisé:\n1) Combatti!\n2) Vinci\n3) Perdi\n");
-                if (scanf("%d", &choice) == 1) { 
-                    switch (choice) {
-                        case 1: 
-                            if (rand()%2) {
-                                printf("%s attacca! ", giocatore->nome);
-                                nemico->saluteCorrente -= infliggiDanni(giocatore->attacco, nemico->difesa);
-                                printf("(Debug: salute rimanente nemico = %d)\n", nemico->saluteCorrente);
-                                
-                                if(nemico->saluteCorrente <= 0) {
-                                    vinciCombattimento(giocatore, indiceNemico);
-                                    return;
-                                }
-
-                                printf("Il nemico attacca! ");
-                                giocatore->saluteCorrente -= infliggiDanni(nemico->attacco, giocatore->difesa);
-                                printf("(Debug: salute rimanente player = %d)\n", giocatore->saluteCorrente);
-                                
-                                if (giocatore->saluteCorrente <= 0) {
-                                    muori(giocatore);
-                                    return;
-                                }
-                            } else {
-                                printf("Il nemico attacca! ");
-                                giocatore->saluteCorrente -= infliggiDanni(nemico->attacco, giocatore->difesa);
-                                printf("(Debug: salute rimanente player = %d)\n", giocatore->saluteCorrente);
-
-                                if (giocatore->saluteCorrente <= 0) {
-                                    muori(giocatore);
-                                    return;
-                                }
-
-                                printf("%s attacca! ", giocatore->nome);
-                                nemico->saluteCorrente -= infliggiDanni(giocatore->attacco, nemico->difesa);
-                                printf("(Debug: salute rimanente nemico = %d)\n", nemico->saluteCorrente);
-
-                                if(nemico->saluteCorrente <= 0) {
-                                    vinciCombattimento(giocatore, indiceNemico);
-                                    return;
-                                }
-                                
-                            }
-                            break;
-                        case 2: //ToDO delete
-                            printf("Sconfiggi l'avversario!\n");
-                            vinciCombattimento(giocatore, indiceNemico);
-                            return;
-                        case 3: //Todo delete
-                            printf("Le tue forze svaniscono e ritorni alle ombre...\n");
-                            muori(giocatore);
-                            return;
-                        default: 
-                            printf("Opzione non valida.\n");
-                            break;
+                if (rand()%2) {
+                    printf("%s attacca! ", giocatore->nome);
+                    nemico->saluteCorrente -= infliggiDanni(giocatore->attacco, nemico->difesa);
+                    printf("(Debug: salute rimanente nemico = %d)\n", nemico->saluteCorrente);
+                    
+                    if(nemico->saluteCorrente <= 0) {
+                        vinciCombattimento(giocatore, indiceNemico);
+                        return;
                     }
+
+                    printf("Il nemico attacca! ");
+                    giocatore->saluteCorrente -= infliggiDanni(nemico->attacco, giocatore->difesa);
+                    printf("(Debug: salute rimanente player = %d)\n", giocatore->saluteCorrente);
+                    
+                    if (giocatore->saluteCorrente <= 0) {
+                        muori(giocatore);
+                        return;
+                    }
+                    pausaEsecuzione();
+                } else {
+                    printf("Il nemico attacca! ");
+                    giocatore->saluteCorrente -= infliggiDanni(nemico->attacco, giocatore->difesa);
+                    printf("(Debug: salute rimanente player = %d)\n", giocatore->saluteCorrente);
+
+                    if (giocatore->saluteCorrente <= 0) {
+                        muori(giocatore);
+                        return;
+                    }
+
+                    printf("%s attacca! ", giocatore->nome);
+                    nemico->saluteCorrente -= infliggiDanni(giocatore->attacco, nemico->difesa);
+                    printf("(Debug: salute rimanente nemico = %d)\n", nemico->saluteCorrente);
+
+                    if(nemico->saluteCorrente <= 0) {
+                        vinciCombattimento(giocatore, indiceNemico);
+                        return;
+                    }
+                    pausaEsecuzione();                    
                 }
             }  
         }
@@ -1240,14 +1236,29 @@ int* semePtr = &seme;
             }
         }
 
+        mostraPunteggio();
+        pausaEsecuzione();
+
         
         return;
     } 
 
 // #endregion
 
+// #region endgame manager
 
+    void pausaEsecuzione() {
+        printf("Premi Enter per continuare.\n");
+        while(getchar() != '\n');
+          
+    }
 
+    static void mostraPunteggio() {
+        printf("MostraPunteggio chiamata.\n");
+        return;
+    }
+
+// #endregion
 
 // #endregion
 
