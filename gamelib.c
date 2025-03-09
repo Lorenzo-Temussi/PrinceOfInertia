@@ -178,7 +178,7 @@ int* semePtr = &seme;
             printf("Da quale porta si accede alla stanza?:\n"
             " 0) DESTRA\n 1) AVANTI\n 2) SINISTRA\n 3) INDIETRO\n");
             int porta;
-            porta = riceviInputNumerico(0, 4);
+            porta = riceviInputNumerico(0, 3);
 
             
 
@@ -245,7 +245,8 @@ int* semePtr = &seme;
             " 1) VELENO\n 2) GUARIGIONE\n 3) AUMENTA_HP\n 4) SPADA_TAGLIENTE\n"
             " 5) SCUDO\n 0) NESSUNO\n");
 
-            if (riceviInputNumerico(0, 5) != -1) {
+            tesoro = riceviInputNumerico(0, 5);
+            if (tesoro != -1) {
                 break;
             } else {
                 printf("Input is invalid.\n");
@@ -485,7 +486,7 @@ int* semePtr = &seme;
         free (stanzaCorrente->successiva);
         stanzaCorrente->successiva = NULL;
         ptrUltimaStanza = stanzaCorrente;
-        printf("stanza deletata alla grande!\n");
+        printf("La stanza è stata cancellata con successo!\n");
         return 1;    
     }
 
@@ -498,9 +499,10 @@ int* semePtr = &seme;
         printf("Ultima stanza creata:\n\n");
         stampaStanza(ptrUltimaStanza, 1);
         printf("Vuoi davvero cancellare questa stanza?\n0) Annulla\n1) Conferma\n");
-        int temp = 0;
+        int temp = -1;
 
-        if ((scanf("%d", &temp) == 1) && temp <= 1 && temp >= 0) {
+        temp = riceviInputNumerico(0, 1);
+        if (temp != -1) {
             if(temp == 0) {
                 printf("Operazione annullata.\n");
                 return;
@@ -556,10 +558,11 @@ int* semePtr = &seme;
 
     void impostaGioco() {
         printf("impostaGioco called.\n");
+        int temp = -1;
         do {
-            int temp = -1;
             printf("Seleziona opzione 0-5:\n 0) Modifica seme\n 1) Inserisci\n 2) Cancella\n 3) Stampa\n 4) Generazione casuale\n 5) Indietro\n");
-            if (scanf("%d", &temp) == 1) {
+            temp = riceviInputNumerico(0, 5);
+            
             switch (temp) {
                 case 0:
                     modificaSemeSelect();
@@ -580,14 +583,9 @@ int* semePtr = &seme;
                     if (chiudiMappa()) {return;} //DONE
                     break;
                 default:
-                    break;
-                } 
-            } else {
-                printf("Input is invalid.\n");
-                
-            }
-                
-
+                    printf("Input is invalid.\n");
+                    continue;
+                }                 
         }
         while (1);
     }
@@ -598,20 +596,15 @@ int* semePtr = &seme;
         int playerNum;
         do {
             printf("Quanti giocatori ci sono? Max 4.\n");
-            if (scanf("%d", &playerNum) == 1) {
-                if (playerNum <= 4 && playerNum >= 1) {
-                    printf("Preparo il gioco per %d giocatori.\n", playerNum);
-                } else {
-                    printf("Questa versione del gioco supporta un massimo di 4 giocatori.\n");       
-                }
-                
+            playerNum = riceviInputNumerico(1, 4);
+            if (playerNum != -1) {
+                    printf("Preparo il gioco per %d giocatori.\n", playerNum);   
+                    return playerNum;      
             } else {
                 printf("Input non valido.\n");
             }  
             while (getchar() != '\n');
-        } while(!(playerNum <= 4 && playerNum >= 1));
-
-        return playerNum;
+        } while(1);
     }
 
     static Giocatore* creaGiocatore() {
@@ -652,11 +645,11 @@ int* semePtr = &seme;
         
 
         if(giocatore->classe == PRINCIPE) {
-            printf("si nu principe\n");
+            printf("Selezionato: PRINCIPE\n");
             giocatore->numEvadiTrabocchetto = 1;
             giocatore->numFuga = 1;
         } else {
-            printf("SI nu bucciott\n");
+            printf("Selezionato: DOPPELGANGER\n");
         }
 
 
@@ -976,7 +969,8 @@ int* semePtr = &seme;
                 }
             }
 
-            if (scanf("%d", &scan) == 1 && scan <= 3 && scan >= 0) {
+            scan = riceviInputNumerico(0, 3);
+            if (scan != -1) {
                 break;
             }
         }
@@ -1023,7 +1017,7 @@ int* semePtr = &seme;
 
     static void giocaTurno(Giocatore* giocatore) {
         
-        int choice;
+        int choice = -1;
         int numAvanza = 1;
         int indiceNemico = 0; 
 
@@ -1035,104 +1029,114 @@ int* semePtr = &seme;
             printf("scegli un'azione %s:\n 1) Avanza!\n 2) Combatti\n 3) Scappa\n"
             " 4) Stampa Giocatore\n 5) Stampa Zona\n 6) Prendi Tesoro\n"
             " 7) Cerca Porta Segreta\n 8) Passa Turno\n", giocatore->nome);
-            if (scanf("%d", &choice) == 1) { 
-                switch (choice) {
-                    case 1: 
-                        if(numAvanza > 0) {
-                            printf("%d\n", numAvanza);
-                            numAvanza = 0;
-                            avanza(giocatore);
-                            innescaTrabocchetto(giocatore, giocatore->posizione);
-                            if(giocatore->posizione->successiva == NULL) {
-                                printf("Nella stanza è presente la principessa, incatenata al muro!\n"
-                                "%s si avvicina per liberarla, ma dalle ombre una risata pretenziosa annuncia la presenza di qualcuno...\n", giocatore->nome);
-                                indiceNemico = 3;
-                                break;
-                            }
-                            indiceNemico = (generaRandomNemico());
-                        } else {
-                            printf("Hai finito i piedi.\n");
-                        }
-                        break;
-                    case 2: 
-                        if(!indiceNemico) {
-                            printf("Assumi una posizione di combattimento, ma non ci sono nemici.\n");
+            choice = riceviInputNumerico(1, 8);
+            switch (choice) {
+                case 1: 
+                    if(numAvanza > 0) {
+                        printf("%d\n", numAvanza);
+                        numAvanza = 0;
+                        avanza(giocatore);
+                        innescaTrabocchetto(giocatore, giocatore->posizione);
+                        if(giocatore->posizione->successiva == NULL) {
+                            printf("Nella stanza è presente la principessa, incatenata al muro!\n"
+                            "%s si avvicina per liberarla, ma dalle ombre una risata pretenziosa annuncia la presenza di qualcuno...\n", giocatore->nome);
+                            indiceNemico = 3;
                             break;
                         }
-                        combatti(giocatore, indiceNemico);
-                        if(indiceNemico == 3 && giocatore->saluteCorrente > 0) {
-                            JaffarSconfitto = 1;
-                            return;
-                        }
-                        indiceNemico = 0;
-                        break;
-                    case 3:
-                        if(!indiceNemico) {
-                            printf("Una paura inspiegabile ti filtra nelle ossa, vuoi fuggire!\n"
-                            "Ma ti riprendi in tempo: nella stanza con te non c'è nessuno...\n");
-                            break;
-                        }
-                        scappa(giocatore);
-                        indiceNemico = 0;
-                        break;
-                    case 4: 
-                        stampaGiocatore(giocatore);
-                        break;
-                    case 5:
-                        stampaStanza(giocatore->posizione, 0);
-                        break;
-                    case 6:
-                        if (!indiceNemico) {
-                            prendiTesoro(giocatore);
-                        } else {
-                            printf("Non è il momento di saccheggiare il palazzo!\n");
-                        }
-                        break;
-                    case 7:
-                    {
-                        int temp;
-                        if (numAvanza <= 0) {
-                            printf("Non puoi trovare stanze segrete senza i piedi!\n");
-                            break;
-                            }
-                        temp = cercaPortaSegreta(giocatore, stanzeTrovate);
-                        if (temp < 0 || temp >= 4) {
-                            break;
-                        } else {
-                            numAvanza --;
-                            for(int i = 0; i <= 4; i++) {
-                                if (stanzeCercate[i] == -1) {
-                                    stanzeCercate[i] = temp;
-                                    break;
-                                }
-                            }
-                        }
+                        indiceNemico = (generaRandomNemico());
+                    } else {
+                        printf("Hai finito i piedi.\n");
+                    }
+                    break;
+                case 2: 
+                    if(!indiceNemico) {
+                        printf("Assumi una posizione di combattimento, ma non ci sono nemici.\n");
                         break;
                     }
-                    case 8: 
-                        if (!indiceNemico) {
-                            printf("%s conclude il suo turno.\n", giocatore->nome);
-                            return;
-                        } else {
-                            printf("Un nemico ti sbarra la strada.\n");
-                            break;
-                        }
-                    default: 
-                        printf("Opzione non valida.\n");
+                    combatti(giocatore, indiceNemico);
+                    if(indiceNemico == 3 && giocatore->saluteCorrente > 0) {
+                        JaffarSconfitto = 1;
+                        return;
+                    }
+                    indiceNemico = 0;
+                    break;
+                case 3:
+                    if(!indiceNemico) {
+                        printf("Una paura inspiegabile ti filtra nelle ossa, vuoi fuggire!\n"
+                        "Ma ti riprendi in tempo: nella stanza con te non c'è nessuno...\n");
                         break;
+                    }
+                    scappa(giocatore);
+                    indiceNemico = 0;
+                    break;
+                case 4: 
+                    stampaGiocatore(giocatore);
+                    break;
+                case 5:
+                    stampaStanza(giocatore->posizione, 0);
+                    break;
+                case 6:
+                    if (!indiceNemico) {
+                        prendiTesoro(giocatore);
+                    } else {
+                        printf("Non è il momento di saccheggiare il palazzo!\n");
+                    }
+                    break;
+                case 7:
+                {
+                    int temp;
+                    if (numAvanza <= 0) {
+                        printf("Non puoi trovare stanze segrete senza i piedi!\n");
+                        break;
+                        }
+                    temp = cercaPortaSegreta(giocatore, stanzeTrovate);
+                    if (temp < 0 || temp >= 4) {
+                        break;
+                    } else {
+                        numAvanza --;
+                        for(int i = 0; i <= 4; i++) {
+                            if (stanzeCercate[i] == -1) {
+                                stanzeCercate[i] = temp;
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                }
+                case 8: 
+                    if (!indiceNemico) {
+                        printf("%s conclude il suo turno.\n", giocatore->nome);
+                        return;
+                    } else {
+                        printf("Un nemico ti sbarra la strada.\n");
+                        break;
+                    }
+                default: 
+                    printf("Opzione non valida.\n");
+                    break;
                 }
             }
         }
-    }
     
     void gioca() {
 
         int numGiocatori = inserisciNumeroGiocatori();  //selezione num. giocatori
         Giocatore* listaGiocatori[numGiocatori];
         int ordineGiocatori[numGiocatori];
+        int principeSelezionato = 0;
 
         for(int i = 0; i < numGiocatori; i++) {     // creazione giocatori
-        listaGiocatori[i] = popolaGiocatore(creaGiocatore());
+        listaGiocatori[i] = creaGiocatore();
+        if (principeSelezionato) {
+            listaGiocatori[i]->classe = DOPPELGANGER;
+        } else if (!(principeSelezionato) && (i == (numGiocatori - 1))) {
+            listaGiocatori[i]->classe = PRINCIPE;
+        }
+
+        listaGiocatori[i] = popolaGiocatore(listaGiocatori[i]);
+        if (listaGiocatori[i]->classe == PRINCIPE) {
+            principeSelezionato = 1;
+        }
         ordineGiocatori[i] = i;
         }
 
