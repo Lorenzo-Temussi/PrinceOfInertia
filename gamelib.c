@@ -36,6 +36,11 @@ int* semePtr = &seme;
         if(!sscanf(buffer, "%d", &temp)) {
             return -1;
         }
+
+        if (temp < minimo || temp > massimo) {
+            return -1;
+        }
+
         return temp;
     }
 
@@ -63,25 +68,26 @@ int* semePtr = &seme;
         int input = -1;
         while(1) {  
             printf("Seleziona un numero tra 000000 e 999999:\n");
-            if((scanf("%d", &input) != 1) || input < 0 || input > 999999) {
-                while(getchar() != '\n');
+            input = riceviInputNumerico(0, 999999);
+            if (input == -1) {
                 continue;
             } 
 
             *semePtr = input;
             srand(*semePtr);
-            printf("seed is now %d", *semePtr);
+            printf("Seme impostato: %d.\n", *semePtr);
             break;
         }
         return;
     }
 
     static void modificaSemeSelect() {
+        int temp = -1;
         while(1) {
-            printf("Selezione 0, 1 o 2.\n");
-            switch(riceviInputNumerico(0, 2)) {
+            printf(" 1) Genera Seed casuale\n 2) Seleziona Seed\n 0) Indietro\n");
+            temp = riceviInputNumerico(0, 2);
+            switch(temp) {
                 case 0:
-                    printf("Caso 0");
                     return;
                 case 1:
                     generaSeed();
@@ -169,15 +175,17 @@ int* semePtr = &seme;
     static int selezionaPorta() {
         while(1) { // selezione porta
         
-            int porta;
             printf("Da quale porta si accede alla stanza?:\n"
             " 0) DESTRA\n 1) AVANTI\n 2) SINISTRA\n 3) INDIETRO\n");
+            int porta;
+            porta = riceviInputNumerico(0, 4);
 
-            if ((scanf("%d", &porta) == 1) && porta >= 0 && porta < 4) {
+            
+
+            if (porta != -1) {
                 // do nun
             } else {
                 printf("Input non valido.\n");
-                while (getchar() != '\n');
                 continue;
             } 
 
@@ -188,7 +196,6 @@ int* semePtr = &seme;
                     continue;
                 }
             }   
-            printf("ptrUltimaStanza non è NULL\n");
             return porta;
         }
     }
@@ -201,8 +208,8 @@ int* semePtr = &seme;
             " 0) CORRIDOIO\n 1) SCALA\n 2) SALA BANCHETTO\n 3) MAGAZZINO"
             "\n 4) POSTAZIONE DI GUARDIA\n 5) PRIGIONE\n 6) ARMERIA\n 7) MOSCHEA\n"
             " 8) TORRE\n 9) BAGNI\n");
-
-            if ((scanf("%d", &tipoStanza) == 1) && tipoStanza >= 0 && tipoStanza <= 9) {
+            tipoStanza = riceviInputNumerico(0, 9);
+            if (tipoStanza != -1) {
                 break;
             } else {
                 printf("Input non valido.\n");
@@ -219,7 +226,8 @@ int* semePtr = &seme;
             printf("Inserisci tipo trabocchetto:\n"
             " 1) PIANOFORTE\n 2) LAME\n 3) BANANA\n 4) BURRONE\n 0) NESSUNO\n");
 
-            if ((scanf("%d", &trabocchetto) == 1) && trabocchetto >= 0 && trabocchetto <= 4) {
+            trabocchetto = riceviInputNumerico(0, 4);
+            if (trabocchetto != -1) {
                 break;
             } else {
                 printf("Input is invalid.\n");
@@ -237,7 +245,7 @@ int* semePtr = &seme;
             " 1) VELENO\n 2) GUARIGIONE\n 3) AUMENTA_HP\n 4) SPADA_TAGLIENTE\n"
             " 5) SCUDO\n 0) NESSUNO\n");
 
-            if ((scanf("%d", &tesoro) == 1) && tesoro >= 0 && tesoro <= 5) {
+            if (riceviInputNumerico(0, 5) != -1) {
                 break;
             } else {
                 printf("Input is invalid.\n");
@@ -424,10 +432,7 @@ int* semePtr = &seme;
     }
 
     static void spingiStanza(Stanza* stanza) {
-        printf("getRoomsCount: %d \n", getRoomCount());
-        stampaStanze();
-        printf("spingiStanza called!\n");
-        if(!getRoomCount()) { //caso prima stanza
+        if(!getRoomCount()) { 
             ptrPrimaStanza = stanza;
             ptrUltimaStanza = stanza;
         } else {
@@ -514,15 +519,11 @@ int* semePtr = &seme;
     }
 
     static void generaRandom() {
-        printf("generaRandom called.\n");
-
-        //Cancella tutte
         
         while(cancellaStanza()) {
             continue;
         }
 
-        //Genera Ex Novo
         int ultimaPorta = rand() %4;
         for (int i = 0; i < 15; i++) {
                     
@@ -540,8 +541,7 @@ int* semePtr = &seme;
             connettiStanza(nuovaStanza, ultimaPorta);
             spingiStanza(nuovaStanza);
         }
-
-        printf("Se riesci a leggere questo, non hai segfaultato\n");
+        printf("Sono state create 15 stanze casuali.\n");
     }
 
     static int chiudiMappa() {
@@ -1129,16 +1129,19 @@ int* semePtr = &seme;
 
         int numGiocatori = inserisciNumeroGiocatori();  //selezione num. giocatori
         Giocatore* listaGiocatori[numGiocatori];
+        int ordineGiocatori[numGiocatori];
 
         for(int i = 0; i < numGiocatori; i++) {     // creazione giocatori
         listaGiocatori[i] = popolaGiocatore(creaGiocatore());
+        ordineGiocatori[i] = i;
         }
 
-
-        while (JaffarSconfitto == 0) {                
-            // genera un giocatore non turnato
+        while (JaffarSconfitto == 0) { 
+            int ordineGiocatoriTemp[numGiocatori];  //TODO HERE a function that initializes a list with shuffled numbers
+                                      
             for(int i = 0; i < numGiocatori; i++) {
-                giocaTurno(listaGiocatori[i]);
+                giocaTurno(listaGiocatori[ordineGiocatori[i]]);
+
                 if (i == numGiocatori) {i = -1;}
             }
         }
@@ -1146,7 +1149,6 @@ int* semePtr = &seme;
         mostraPunteggio();
         pausaEsecuzione();
 
-        
         return;
     } 
 
@@ -1166,24 +1168,23 @@ int* semePtr = &seme;
 
 // #endregion
 
-// #endregion
 
 void crediti() {
-    printf("crediti called.\n");
+    printf("  Una produzione di: Il Tecnotrespolo con Corax Crowe\n"
+    "  Lead Designer: Lorenzo Temussi\n  Lead Artist: Lorenzo Temussi\n  Level Designer: Lorenzo Temussi\n"
+    "Ringrazio un collega anonimo per il feedback eccezionale che ha offerto, e Luca, Antonio"
+    ", Bedetta e Tiziano per aver playtestato questo prodotto quando ancora era tutto tranne che completo.\n"
+    "\n  Liberamente ispirato da uno script di Francesco Santini e da un videogame di Jordan Mechner.");
 }
 
 void terminaGioco() {
-    printf("terminaGioco called.\n");
+    printf("Fine sessione\n");
     exit(0);
 }
 
 
-
 // external save/load
 
-void Debug(struct Stanza* last) {
-    
-}
 /*
 void writeToFile(const char *filename, struct Stanza *s) {
     FILE *file = fopen(filename, "w");
