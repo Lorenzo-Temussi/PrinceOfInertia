@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 // Questo file continene solo la definizione della funzione main
-// con il menu principale 1-2-3
+// con il menu principale 1-2-3-4
 
 
 
@@ -11,9 +11,6 @@ int main( ) {
 
     inizializzaSeme();
 
-    Giocatore** giocatori = (Giocatore**)malloc(__SIZEOF_POINTER__*4);
-
-    Giocatore* giocatore_corrente = NULL;
     
     //Debug(lastRoom);
 

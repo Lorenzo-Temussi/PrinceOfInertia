@@ -75,7 +75,7 @@ static void vinciCombattimento(Giocatore* giocatore, int nemico);
 static void muori(Giocatore* giocatore);
 static void scappa(Giocatore* giocatore);
 static void prendiTesoro(Giocatore* giocatore);
-static int cercaPortaSegreta(Giocatore* giocatore, int stanzeTrovate);
+static int cercaPortaSegreta(Giocatore* giocatore);
 static int passaTurno(int nemico);
 
 static void innescaTrabocchetto(Giocatore* giocatore, Stanza* stanza);
@@ -160,6 +160,7 @@ struct Stanza {
     enum tipo_tesoro tipoTesoro;
 
     Stanza* porte [4]; //Ordine: dx, uw, sx, dw (come la circ. goniometrica)
+    int porteSegrete [4];
     char* direzionePorte [4];
     Stanza* successiva;
 };

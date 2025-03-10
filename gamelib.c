@@ -401,6 +401,11 @@ int* semePtr = &seme;
         temp->porte[3] = NULL;
         temp->successiva = NULL;
 
+        temp->porteSegrete[0] = 0;
+        temp->porteSegrete[1] = 0;
+        temp->porteSegrete[2] = 0;
+        temp->porteSegrete[3] = 0;
+
         char* stringa[10];
 
         for(int i = 0; i<4; i++) {
@@ -429,6 +434,7 @@ int* semePtr = &seme;
         stanza->porte[indicePorta] = ptrUltimaStanza;
         
         ptrUltimaStanza->porte[(indicePorta + 2) %4] = stanza;
+        ptrUltimaStanza->porteSegrete[(indicePorta + 2) %4] = -1;
         ptrUltimaStanza->successiva = stanza;
     }
 
@@ -960,39 +966,50 @@ int* semePtr = &seme;
         return creaStanza(generaRandomStanza(), generaRandomTrabocchetto(), generaRandomTesoro());
     }
 
-    static int cercaPortaSegreta(Giocatore* giocatore, int stanzeTrovate) {
+    static int cercaPortaSegreta(Giocatore* giocatore) {
         int scan = -1;
+        int stanzeSegretePotenziali = 4;
+
         while(scan < 0 || scan > 3) {
             for (int i = 0; i <= 3; i++) {
-                if (giocatore->posizione->porte[i] != giocatore->posizione->successiva) {
-                    printf(" %d) Cerca stanza segreta a %s.", i, giocatore->posizione->direzionePorte[i]);
+                //printf("Debug: porteSegrete[%d] = %d\n", i, giocatore->posizione->porteSegrete[i]);
+                if (giocatore->posizione->porteSegrete[i] == 0) {
+                    printf(" %d) Cerca stanza segreta a %s.\n", i, giocatore->posizione->direzionePorte[i]);
                 }
             }
 
             scan = riceviInputNumerico(0, 3);
-            if (scan != -1) {
+            if (scan != -1 && (giocatore->posizione->porteSegrete[scan] == 0)) {
                 break;
             }
         }
 
         
+        for(int i = 0; i <= 3; i++) {
+            if(giocatore->posizione->porteSegrete[i] != 0) {
+                stanzeSegretePotenziali --;
+            }
+        }
 
-        switch (stanzeTrovate) {
-            case 0:
+        switch (stanzeSegretePotenziali) {
+            case 3:
                 if (!(rand()%100 < 33)) {
                     printf("Dopo un'attenta investigazione, concludi che non c'è alcuna stanza segreta verso %s.\n", giocatore->posizione->direzionePorte[scan]);
-                    return scan;
-                }
-                break;
-            case 1:
-                if (!(rand()%100 < 20)) {
-                    printf("Dopo un'attenta investigazione, concludi che non c'è alcuna stanza segreta verso %s.\n", giocatore->posizione->direzionePorte[scan]);
+                    giocatore->posizione->porteSegrete[scan] = -1;
                     return scan;
                 }
                 break;
             case 2:
+                if (!(rand()%100 < 20)) {
+                    printf("Dopo un'attenta investigazione, concludi che non c'è alcuna stanza segreta verso %s.\n", giocatore->posizione->direzionePorte[scan]);
+                    giocatore->posizione->porteSegrete[scan] = -1;                    
+                    return scan;
+                }
+                break;
+            case 1:
                 if (!(rand()%100 < 15)) {
                     printf("Dopo un'attenta investigazione, concludi che non c'è alcuna stanza segreta verso %s.\n", giocatore->posizione->direzionePorte[scan]);
+                    giocatore->posizione->porteSegrete[scan] = -1;                    
                     return scan;
                 }
                 break;
@@ -1011,6 +1028,7 @@ int* semePtr = &seme;
         prendiTesoro(giocatore);
 
         giocatore->posizione = prev;
+        giocatore->posizione->porteSegrete[scan] = 1;
         return scan;
 
     }
@@ -1020,9 +1038,6 @@ int* semePtr = &seme;
         int choice = -1;
         int numAvanza = 1;
         int indiceNemico = 0; 
-
-        int stanzeTrovate = 0;
-        int stanzeCercate[] = {-1, -1, -1, -1};
 
         while(giocatore->saluteCorrente > 0) {
 
@@ -1084,19 +1099,18 @@ int* semePtr = &seme;
                     break;
                 case 7:
                 {
-                    int temp;
+                    int temp = -1;
                     if (numAvanza <= 0) {
                         printf("Non puoi trovare stanze segrete senza i piedi!\n");
                         break;
                         }
-                    temp = cercaPortaSegreta(giocatore, stanzeTrovate);
+                    temp = cercaPortaSegreta(giocatore);
                     if (temp < 0 || temp >= 4) {
                         break;
                     } else {
                         numAvanza --;
                         for(int i = 0; i <= 4; i++) {
-                            if (stanzeCercate[i] == -1) {
-                                stanzeCercate[i] = temp;
+                            if (giocatore->posizione->porteSegrete[i] == 0) {
                                 break;
                             }
                         }
