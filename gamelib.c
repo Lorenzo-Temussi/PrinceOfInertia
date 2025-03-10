@@ -29,7 +29,7 @@ int* semePtr = &seme;
         }
     }
 
-    static int riceviInputNumerico (int minimo, int massimo) {
+    int riceviInputNumerico (int minimo, int massimo) {
         int temp = -1;
         char buffer [8];
         riceviInputStringa(buffer, 8);
@@ -838,7 +838,7 @@ int* semePtr = &seme;
                 if (rand()%2) {
                     printf("%s attacca! ", giocatore->nome);
                     nemico->saluteCorrente -= infliggiDanni(giocatore->attacco, nemico->difesa);
-                    printf("(Debug: salute rimanente nemico = %d)\n", nemico->saluteCorrente);
+                    printf("Salute nemico: %d\n", nemico->saluteCorrente);
                     
                     if(nemico->saluteCorrente <= 0) {
                         vinciCombattimento(giocatore, indiceNemico);
@@ -847,7 +847,7 @@ int* semePtr = &seme;
 
                     printf("Il nemico attacca! ");
                     giocatore->saluteCorrente -= infliggiDanni(nemico->attacco, giocatore->difesa);
-                    printf("(Debug: salute rimanente player = %d)\n", giocatore->saluteCorrente);
+                    printf("Salute %s: %d\n", giocatore->nome, giocatore->saluteCorrente);
                     
                     if (giocatore->saluteCorrente <= 0) {
                         muori(giocatore);
@@ -857,7 +857,7 @@ int* semePtr = &seme;
                 } else {
                     printf("Il nemico attacca! ");
                     giocatore->saluteCorrente -= infliggiDanni(nemico->attacco, giocatore->difesa);
-                    printf("(Debug: salute rimanente player = %d)\n", giocatore->saluteCorrente);
+                    printf("Salute %s: %d)\n", giocatore->nome, giocatore->saluteCorrente);
 
                     if (giocatore->saluteCorrente <= 0) {
                         muori(giocatore);
@@ -866,7 +866,7 @@ int* semePtr = &seme;
 
                     printf("%s attacca! ", giocatore->nome);
                     nemico->saluteCorrente -= infliggiDanni(giocatore->attacco, nemico->difesa);
-                    printf("(Debug: salute rimanente nemico = %d)\n", nemico->saluteCorrente);
+                    printf("Salute nemico: %d)\n", nemico->saluteCorrente);
 
                     if(nemico->saluteCorrente <= 0) {
                         vinciCombattimento(giocatore, indiceNemico);

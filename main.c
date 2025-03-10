@@ -17,10 +17,10 @@ int main( ) {
     
     //Debug(lastRoom);
 
-    int state = 0;
+    int state = -1;
     do {
         printf("Selezione 1-4:\n 1) Imposta Partita\n 2) Inizia Partita\n 3) Chiudi Gioco\n 4) Crediti\n");
-        if (scanf("%d", &state) == 1) {
+        state = riceviInputNumerico(1, 4);
             switch(state) {
             case 1:
                 impostaGioco(); //COMPLETA!
@@ -36,13 +36,9 @@ int main( ) {
                 break;
             default:
                 printf("Input is invalid.\n");
+                while (getchar() != '\n');
                 break;
-            }
-        } else {
-            printf("Input is invalid.\n");
-            while (getchar() != '\n');
-        }        
+            } 
     } 
     while(1);
-
 }

@@ -7,6 +7,8 @@ typedef struct Nemico Nemico;
 //
 // SEZIONE 1 - IMPOSTA
 //
+static void riceviInputStringa(char* buffer, int dimensione);
+int riceviInputNumerico(int minimo, int massimo);
 
 void inizializzaSeme();
 static void modificaSemeSelect();
