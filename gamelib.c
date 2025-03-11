@@ -658,6 +658,7 @@ int* semePtr = &seme;
             printf("Selezionato: DOPPELGANGER\n");
         }
 
+        
 
         char string[100];
         while(1) {
@@ -668,10 +669,10 @@ int* semePtr = &seme;
             } else {
                 printf("Input non valido.\n");
             }  
-            while (getchar() != '\n');
+            
         }
             strcpy(giocatore->nome, string);  // Copy the string into the allocated memory
-        
+            while (getchar() != '\n');
         giocatore->posizione = ptrPrimaStanza;
 
         giocatore->attacco = 2;
@@ -690,26 +691,28 @@ int* semePtr = &seme;
         }
         switch (stanza->tipoTrabocchetto) {
             case 0:
-                printf("La stanza non contiene trappole, traboccheti, botole o cazzi analoghi.\n");
+                printf("La stanza non contiene trappole, trabocchetti, botole o cazzi analoghi.\n");
                 break;
             case 1:
-                printf("Un pianoforte cade dall'alto sulla testa di %s, spaccandone varie ossa\n", giocatore->nome);
+                printf("Un pianoforte cade dall'alto sulla testa di %s, spaccandone varie ossa\nPerde 2 PS.\n", giocatore->nome);
                 giocatore->saluteCorrente -=2;
                 break;
             case 2:
-                printf("Numerose lame vengono lanciate da apposite fessure nei muri, e si conficcano nelle carni di %s\n", giocatore->nome);
+                printf("Numerose lame vengono lanciate da apposite fessure nei muri, e si conficcano nelle carni di %s\nPerde 1 PS.\n", giocatore->nome);
                 giocatore->saluteCorrente -= 1;
                 break;
             case 3:
-                printf("L'ignaro/a %s, scivola sul pavimento saponatissimo e sbatte lo zigomo su un tavolo\n", giocatore->nome);
+                printf("L'ignaro/a %s, scivola sul pavimento saponatissimo e sbatte lo zigomo su un tavolo\nPerde 1 DEF.\n", giocatore->nome);
                 giocatore->difesa -= 1;
                 break;
             case 4:
-                printf("Il pavimento si apre e %s cade in una botola piena di pezzi lego\n", giocatore->nome);
-                giocatore->attacco -= 1;
+                printf("Il pavimento si apre e %s cade in una botola piena di pezzi lego\nNon riesce più a correre come prima.\n", giocatore->nome);
+                if (giocatore->numFuga > 0) {
+                    giocatore->numFuga -= 1;
+                    }
                 break;
             default:
-                printf("Non so come hai fatto ma sei riuscito a far buggare una variabile.\n");
+                printf("Non so come hai fatto ma sei riuscito a far buggare una variabile dura.\n");
                 break;
         }
         if (giocatore->saluteCorrente <= 0) {
@@ -834,6 +837,7 @@ int* semePtr = &seme;
         static void muori (Giocatore* giocatore) {
             printf("Sei morto!\n");
             giocatore->saluteCorrente = 0;
+            pausaEsecuzione();
             return;
         }
 
@@ -863,7 +867,7 @@ int* semePtr = &seme;
                 } else {
                     printf("Il nemico attacca! ");
                     giocatore->saluteCorrente -= infliggiDanni(nemico->attacco, giocatore->difesa);
-                    printf("Salute %s: %d)\n", giocatore->nome, giocatore->saluteCorrente);
+                    printf("Salute %s: %d\n", giocatore->nome, giocatore->saluteCorrente);
 
                     if (giocatore->saluteCorrente <= 0) {
                         muori(giocatore);
@@ -872,7 +876,7 @@ int* semePtr = &seme;
 
                     printf("%s attacca! ", giocatore->nome);
                     nemico->saluteCorrente -= infliggiDanni(giocatore->attacco, nemico->difesa);
-                    printf("Salute nemico: %d)\n", nemico->saluteCorrente);
+                    printf("Salute nemico: %d\n", nemico->saluteCorrente);
 
                     if(nemico->saluteCorrente <= 0) {
                         vinciCombattimento(giocatore, indiceNemico);
