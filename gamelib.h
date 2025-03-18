@@ -3,6 +3,7 @@
 typedef struct Stanza Stanza;
 typedef struct Giocatore Giocatore;
 typedef struct Nemico Nemico;
+typedef struct Punteggio Punteggio;
 
 //
 // SEZIONE 1 - IMPOSTA
@@ -82,7 +83,7 @@ static void innescaTrabocchetto(Giocatore* giocatore, Stanza* stanza);
 static int generaRandomNemico();
 
 //gameover
-static void mostraPunteggio();
+static void mostraPunteggio(Giocatore* giocatore);
 static void pausaEsecuzione();
 
 // Ipse
@@ -95,6 +96,9 @@ void gioca();
 //
 // SEZIONE 3 - CREDITI
 //
+void inizializzaTabellonePunteggi();
+void stampaTabellonePunteggi();
+
 
 void crediti();
 
@@ -178,7 +182,7 @@ struct Giocatore{
     int numFuga;
 
     Giocatore* successivo;
-    Giocatore* punteggio;
+    int punteggio;
 
 };
 
@@ -190,4 +194,9 @@ struct Nemico {
     int saluteCorrente;
     int attacco;
     int difesa;
+};
+
+struct Punteggio {
+    char* nome;
+    int punteggio;  
 };

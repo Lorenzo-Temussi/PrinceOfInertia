@@ -10,6 +10,61 @@
 Stanza* ptrPrimaStanza = NULL;
 Stanza* ptrUltimaStanza = NULL;
 
+Punteggio* tabellonePunteggi[5];
+
+void inizializzaTabellonePunteggi() {
+    for (int i = 0; i <5; i++) {
+        tabellonePunteggi[i] =(Punteggio*)malloc(sizeof(Punteggio));
+    }
+
+    tabellonePunteggi[0]->nome = "Ali_Baba";
+    tabellonePunteggi[0]->punteggio = 1000;
+
+    tabellonePunteggi[1]->nome = "Aladdin";
+    tabellonePunteggi[1]->punteggio = 900;
+
+    tabellonePunteggi[2]->nome = "Corto_Maltese";
+    tabellonePunteggi[2]->punteggio = 800;
+
+    tabellonePunteggi[3]->nome = "Papa_Francesco";
+    tabellonePunteggi[3]->punteggio = 700;
+
+    tabellonePunteggi[4]->nome = "Mister_Rogers";
+    tabellonePunteggi[4]->punteggio = 400;
+    
+}
+
+static void ordinaTabellonePunteggi() {
+    for (int i = 0; i < 5; i ++) {
+        for (int j = 1; j < 5 - i; j++) {
+         if((tabellonePunteggi[i]->punteggio < (tabellonePunteggi[i + j]->punteggio))) {
+            Punteggio* temp = tabellonePunteggi[i + j];
+            tabellonePunteggi[i + j] = tabellonePunteggi[i];
+            tabellonePunteggi[i] = temp;
+            }
+            
+        }
+    }
+}
+
+static int nuovoRecord (Punteggio* record) {
+        if (tabellonePunteggi[4]->punteggio < record->punteggio) {
+            tabellonePunteggi[4]->punteggio = record->punteggio;
+            tabellonePunteggi[4]->nome = record->nome;
+            return 1;
+    }
+    return 0;
+}
+
+void stampaTabellonePunteggi () {
+    printf("****SALA DEI RECORD****\n\n");
+    for (int i = 0; i < 5; i++) {
+        printf("%d): %s ............. %d\n", i + 1, tabellonePunteggi[i]->nome, tabellonePunteggi[i]->punteggio);
+    }
+    printf("\n");
+    pausaEsecuzione();
+}
+
 
 int JaffarSconfitto = 0;
 
@@ -52,8 +107,6 @@ int* semePtr = &seme;
         *semePtr = value % 1000000;
         
         srand(*semePtr);
-        
-        printf("seed is now %d", *semePtr);
         return;
     }
 
@@ -377,7 +430,6 @@ int* semePtr = &seme;
     }
 
     static void stampaStanze() {
-        printf("stampaStanze called.\n");
         Stanza* stanzaCorrente = ptrPrimaStanza;
         
         if(!stanzaCorrente) { //caso 0 stanze
@@ -392,7 +444,6 @@ int* semePtr = &seme;
     }
 
     static Stanza* creaStanza(int tipoStanza, int tipoTrabocchetto, int tipoTesoro) {
-        printf("creaStanza called!\n");
         Stanza* temp = (Stanza*)malloc(sizeof(Stanza));
         
         temp->porte[0] = NULL;
@@ -430,7 +481,6 @@ int* semePtr = &seme;
             return;
         }
 
-        printf("connettiStanza called!\n");
         stanza->porte[indicePorta] = ptrUltimaStanza;
         
         ptrUltimaStanza->porte[(indicePorta + 2) %4] = stanza;
@@ -563,7 +613,6 @@ int* semePtr = &seme;
     }
 
     void impostaGioco() {
-        printf("impostaGioco called.\n");
         int temp = -1;
         do {
             printf("Seleziona opzione 0-5:\n 0) Modifica seme\n 1) Inserisci\n 2) Cancella\n 3) Stampa\n 4) Generazione casuale\n 5) Indietro\n");
@@ -687,6 +736,7 @@ int* semePtr = &seme;
             "Con un salto, una schivata e un ruzzolone, %s evade la trappola in questa stanza!",
             giocatore->nome, giocatore->nome);
             giocatore->numEvadiTrabocchetto --;
+            giocatore->punteggio += 50;
             return;
         }
         switch (stanza->tipoTrabocchetto) {
@@ -696,14 +746,19 @@ int* semePtr = &seme;
             case 1:
                 printf("Un pianoforte cade dall'alto sulla testa di %s, spaccandone varie ossa\nPerde 2 PS.\n", giocatore->nome);
                 giocatore->saluteCorrente -=2;
+                giocatore->punteggio += 200;
                 break;
             case 2:
                 printf("Numerose lame vengono lanciate da apposite fessure nei muri, e si conficcano nelle carni di %s\nPerde 1 PS.\n", giocatore->nome);
                 giocatore->saluteCorrente -= 1;
+                giocatore->punteggio += 70;
                 break;
             case 3:
-                printf("L'ignaro/a %s, scivola sul pavimento saponatissimo e sbatte lo zigomo su un tavolo\nPerde 1 DEF.\n", giocatore->nome);
-                giocatore->difesa -= 1;
+                printf("L'ignaro/a %s, scivola sul pavimento saponatissimo e sbatte lo zigomo su un tavolo\nNon riesce più a rotolare come prima.\n", giocatore->nome);
+                if (giocatore->numEvadiTrabocchetto > 0) {
+                    giocatore->numEvadiTrabocchetto -= 1;
+                    }
+                    
                 break;
             case 4:
                 printf("Il pavimento si apre e %s cade in una botola piena di pezzi lego\nNon riesce più a correre come prima.\n", giocatore->nome);
@@ -737,8 +792,8 @@ int* semePtr = &seme;
     }
 
     static void avanza(Giocatore* giocatore) {
-        if(!giocatore->posizione->successiva) {
-            printf("Debug: questa è l'ultima stanza, non è possibile avanzare ancora.\n");
+        if(giocatore->posizione->successiva == NULL) {
+            printf("Questa è l'ultima stanza, non è possibile avanzare ancora.\n");
             return;
         }
 
@@ -746,6 +801,7 @@ int* semePtr = &seme;
         stampaTipoStanza(giocatore->posizione->successiva);
 
         giocatore->posizione = giocatore->posizione->successiva;
+        giocatore->punteggio += 40;
     }
     
     // Blocco Combatti
@@ -812,16 +868,21 @@ int* semePtr = &seme;
                     ", doppiato da Gilbert Gottfried, ti sbarrano la strada!\n");
                     break;
                 default: 
-                    printf("In questa stanza non sembra esserci nessuno\n");
+                    printf("In questa stanza sembra non esserci nessuno\n");
                     return NULL;
             }
             return temp;
         }
 
         static void vinciCombattimento(Giocatore* giocatore, int nemico) {
-            printf("vinci called.\n");
+            giocatore->punteggio += nemico * 100;
             if(nemico == 3) {
                 JaffarSconfitto = 1;
+                printf("Il perfido Jaffar si accascia a terra, la sua pelle si tramuta in sabbia e le sue ossa ESPLODONO."
+                "Il suo pappagallo, travolto dall'esplosione, diventa un pacchetto da sei pezzi di chicken nuggets, che "
+                "%s e la principessa mangiano sulla via per casa.\n", giocatore->nome);
+                pausaEsecuzione();
+                return;
             }
 
             if(giocatore->saluteCorrente < giocatore->saluteMax) {
@@ -842,7 +903,7 @@ int* semePtr = &seme;
         }
 
         static void combatti(Giocatore* giocatore, int indiceNemico) {
-            printf("combatti called.\n"); 
+            printf("Inzia la battaglia!\n");
             Nemico* nemico = inizializzaNemico(indiceNemico);
             while(giocatore->saluteCorrente > 0) { 
                 if (rand()%2) {
@@ -852,6 +913,8 @@ int* semePtr = &seme;
                     
                     if(nemico->saluteCorrente <= 0) {
                         vinciCombattimento(giocatore, indiceNemico);
+                        free(nemico);
+                        nemico = NULL;
                         return;
                     }
 
@@ -861,6 +924,8 @@ int* semePtr = &seme;
                     
                     if (giocatore->saluteCorrente <= 0) {
                         muori(giocatore);
+                        free(nemico);
+                        nemico = NULL;
                         return;
                     }
                     pausaEsecuzione();
@@ -871,6 +936,8 @@ int* semePtr = &seme;
 
                     if (giocatore->saluteCorrente <= 0) {
                         muori(giocatore);
+                        free(nemico);
+                        nemico = NULL;
                         return;
                     }
 
@@ -880,6 +947,8 @@ int* semePtr = &seme;
 
                     if(nemico->saluteCorrente <= 0) {
                         vinciCombattimento(giocatore, indiceNemico);
+                        free(nemico);
+                        nemico = NULL;
                         return;
                     }
                     pausaEsecuzione();                    
@@ -935,6 +1004,7 @@ int* semePtr = &seme;
             case VELENO:
                 printf("Bevi il contenuto dell'ampolla.\n Un dolore terribile ti scuote da testa a piedi. Perdi 1 PS.\n");
                 giocatore->saluteCorrente -= 1;
+                giocatore->punteggio += 50;
                 if (giocatore->saluteCorrente <= 0) {
                     muori(giocatore);
                 }
@@ -976,7 +1046,6 @@ int* semePtr = &seme;
 
         while(scan < 0 || scan > 3) {
             for (int i = 0; i <= 3; i++) {
-                //printf("Debug: porteSegrete[%d] = %d\n", i, giocatore->posizione->porteSegrete[i]);
                 if (giocatore->posizione->porteSegrete[i] == 0) {
                     printf(" %d) Cerca stanza segreta a %s.\n", i, giocatore->posizione->direzionePorte[i]);
                 }
@@ -1043,7 +1112,7 @@ int* semePtr = &seme;
         int numAvanza = 1;
         int indiceNemico = 0; 
 
-        while(giocatore->saluteCorrente > 0) {
+        while(giocatore->saluteCorrente > 0 && !JaffarSconfitto) {
 
             printf("scegli un'azione %s:\n 1) Avanza!\n 2) Combatti\n 3) Scappa\n"
             " 4) Stampa Giocatore\n 5) Stampa Zona\n 6) Prendi Tesoro\n"
@@ -1073,10 +1142,7 @@ int* semePtr = &seme;
                         break;
                     }
                     combatti(giocatore, indiceNemico);
-                    if(indiceNemico == 3 && giocatore->saluteCorrente > 0) {
-                        JaffarSconfitto = 1;
-                        return;
-                    }
+                    
                     indiceNemico = 0;
                     break;
                 case 3:
@@ -1138,6 +1204,7 @@ int* semePtr = &seme;
     
     void gioca() {
 
+        JaffarSconfitto = 0;
         int numGiocatori = inserisciNumeroGiocatori();  //selezione num. giocatori
         Giocatore* listaGiocatori[numGiocatori];
         int ordineGiocatori[numGiocatori];
@@ -1159,8 +1226,17 @@ int* semePtr = &seme;
         }
 
         while (JaffarSconfitto == 0) { 
-            int ordineGiocatoriTemp[numGiocatori];  //TODO HERE a function that initializes a list with shuffled numbers
-                                      
+            
+            for (int i = 0; i < 30; i++) {
+                int rand1 = rand() % numGiocatori;
+                int rand2 = rand() % numGiocatori;
+                int var = 0;
+                var = ordineGiocatori[rand1];
+                ordineGiocatori[rand1] = ordineGiocatori[rand2];
+                ordineGiocatori[rand2] = var;
+            }
+
+
             for(int i = 0; i < numGiocatori; i++) {
                 giocaTurno(listaGiocatori[ordineGiocatori[i]]);
 
@@ -1168,7 +1244,18 @@ int* semePtr = &seme;
             }
         }
 
-        mostraPunteggio();
+        printf("PUNTEGGI: \n\n");
+
+        for (int i = 0; i < numGiocatori; i++) {
+
+            if (listaGiocatori[i]->punteggio > tabellonePunteggi[4]->punteggio) {
+                tabellonePunteggi[4]->nome = listaGiocatori[i]->nome;
+                tabellonePunteggi[4]->punteggio = listaGiocatori[i]->punteggio;
+                ordinaTabellonePunteggi();
+            }
+
+            mostraPunteggio(listaGiocatori[i]);
+        }
         pausaEsecuzione();
 
         return;
@@ -1183,8 +1270,8 @@ int* semePtr = &seme;
         while(getchar() != '\n');
     }
 
-    static void mostraPunteggio() {
-        printf("MostraPunteggio chiamata.\n");
+    static void mostraPunteggio(Giocatore* giocatore) {
+        printf("%s: .............. %d punti\n\n", giocatore->nome, giocatore->punteggio);
         return;
     }
 
@@ -1194,9 +1281,9 @@ int* semePtr = &seme;
 void crediti() {
     printf("  Una produzione di: Il Tecnotrespolo con Corax Crowe\n"
     "  Lead Designer: Lorenzo Temussi\n  Lead Artist: Lorenzo Temussi\n  Level Designer: Lorenzo Temussi\n"
-    "Ringrazio un collega anonimo per il feedback eccezionale che ha offerto, e Luca, Antonio"
+    "  Ringrazio un collega anonimo per il feedback eccezionale che ha offerto, e Luca, Luca, Antonio"
     ", Bedetta e Tiziano per aver playtestato questo prodotto quando ancora era tutto tranne che completo.\n"
-    "\n  Liberamente ispirato da uno script di Francesco Santini e da un videogame di Jordan Mechner.");
+    "\n  Liberamente ispirato da uno script di Francesco Santini e da un videogame di Jordan Mechner.\n\n");
 }
 
 void terminaGioco() {

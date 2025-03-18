@@ -10,6 +10,7 @@
 int main( ) {
 
     inizializzaSeme();
+    inizializzaTabellonePunteggi();
 
     
     //Debug(lastRoom);
@@ -30,6 +31,7 @@ int main( ) {
                 break;
             case 4: 
                 crediti(); //WIP
+                stampaTabellonePunteggi();
                 break;
             default:
                 printf("Input is invalid.\n");
