@@ -6,6 +6,13 @@
 #include <sys/time.h>
 #include <time.h>
 
+//Funzioni Statiche
+
+static void pausaEsecuzione();
+static void muori(Giocatore* giocatore);
+static void mostraPunteggio(Giocatore* giocatore);
+
+
 
 Stanza* ptrPrimaStanza = NULL;
 Stanza* ptrUltimaStanza = NULL;
@@ -47,13 +54,15 @@ static void ordinaTabellonePunteggi() {
     }
 }
 
-static int nuovoRecord (Punteggio* record) {
-        if (tabellonePunteggi[4]->punteggio < record->punteggio) {
-            tabellonePunteggi[4]->punteggio = record->punteggio;
-            tabellonePunteggi[4]->nome = record->nome;
-            return 1;
+static int valutaPunteggio (Giocatore* giocatore) {
+    if (giocatore->punteggio > tabellonePunteggi[4]->punteggio) {
+        tabellonePunteggi[4]->nome = giocatore->nome;
+        tabellonePunteggi[4]->punteggio = giocatore->punteggio;
+        ordinaTabellonePunteggi();
+        return 1;
+    } else {
+        return 0;
     }
-    return 0;
 }
 
 void stampaTabellonePunteggi () {
@@ -71,9 +80,6 @@ int JaffarSconfitto = 0;
 int seme = 0;
 int* semePtr = &seme;
 
-
-// Definizioni delle funzioni in gamelib.c.
-// Piu altre funzioni di supporto.
 // Le funzioni richiamabili in main.c non devono essere static.
 // Le altre devono essere static (non visibili all'esterno).
 
@@ -211,7 +217,7 @@ int* semePtr = &seme;
         return stanzeTotali;
     }
 
-    static void aggiornaUltimaStanza() { //COMPLETA - LL
+    /*static void aggiornaUltimaStanza() { //COMPLETA - LL
         struct Stanza* stanzaCorrente = ptrPrimaStanza;
         if (stanzaCorrente == NULL)  {
             ptrUltimaStanza = NULL;
@@ -223,7 +229,7 @@ int* semePtr = &seme;
         }
         
         ptrUltimaStanza = stanzaCorrente;
-    }
+    }*/
 
     static int selezionaPorta() {
         while(1) { // selezione porta
@@ -499,7 +505,7 @@ int* semePtr = &seme;
 
     static void creaStanzaMain() {
 
-        struct Stanza* porte [4] = {NULL, NULL, NULL, NULL}; 
+        //DEBUG struct Stanza* porte [4] = {NULL, NULL, NULL, NULL}; 
         
         if (getRoomCount()  >= 15) {
             printf("Numero massimo di stanze raggiunto.\n");
@@ -585,7 +591,7 @@ int* semePtr = &seme;
         int ultimaPorta = rand() %4;
         for (int i = 0; i < 15; i++) {
                     
-            struct Stanza* porte[4] = {NULL, NULL, NULL, NULL};
+            //DEBUG struct Stanza* porte[4] = {NULL, NULL, NULL, NULL};
 
             int tipoStanza = generaRandomStanza();
 
@@ -709,19 +715,33 @@ int* semePtr = &seme;
 
         
 
-        char string[100];
+        char inputName[100];
         while(1) {
             printf("Inserisci nome:\n ");
-            if(scanf("%99s", string)) {
+
+            //if (fgets(inputName, 99, stdin) != NULL && !strchr(inputName, '\n')) {
+                riceviInputStringa(inputName, 99);
+
+                if (strlen(inputName) > 0 && inputName[strlen(inputName) - 1] == '\n') {
+                    inputName[strlen(inputName) - 1] = '\0';
+                    while (getchar() != '\n');
+                    giocatore->nome = (char*)malloc(strlen(inputName) + 1);
+                    break;
+                } else {
+                printf("Error reading input.\n");
+            }
+        }
+
+            /*if(scanf("%99s", string)) {
                 giocatore->nome = malloc(strlen(string) + 1);
                 break;
             } else {
                 printf("Input non valido.\n");
-            }  
+            }
+        }  */
             
-        }
-            strcpy(giocatore->nome, string);  // Copy the string into the allocated memory
-            while (getchar() != '\n');
+        
+        strcpy(giocatore->nome, inputName);  // Copy the string into the allocated memory
         giocatore->posizione = ptrPrimaStanza;
 
         giocatore->attacco = 2;
@@ -1044,6 +1064,17 @@ int* semePtr = &seme;
         int scan = -1;
         int stanzeSegretePotenziali = 4;
 
+        for(int i = 0; i <= 3; i++) {
+            if(giocatore->posizione->porteSegrete[i] != 0) {
+                stanzeSegretePotenziali --;
+            }
+        }
+
+        if(stanzeSegretePotenziali == 0) {
+            printf("Hai cercato ovunque, qui non ci sono porte segrete da nessuna parte.\n");
+            return -1;
+        }
+        
         while(scan < 0 || scan > 3) {
             for (int i = 0; i <= 3; i++) {
                 if (giocatore->posizione->porteSegrete[i] == 0) {
@@ -1058,11 +1089,6 @@ int* semePtr = &seme;
         }
 
         
-        for(int i = 0; i <= 3; i++) {
-            if(giocatore->posizione->porteSegrete[i] != 0) {
-                stanzeSegretePotenziali --;
-            }
-        }
 
         switch (stanzeSegretePotenziali) {
             case 3:
@@ -1248,10 +1274,9 @@ int* semePtr = &seme;
 
         for (int i = 0; i < numGiocatori; i++) {
 
-            if (listaGiocatori[i]->punteggio > tabellonePunteggi[4]->punteggio) {
-                tabellonePunteggi[4]->nome = listaGiocatori[i]->nome;
-                tabellonePunteggi[4]->punteggio = listaGiocatori[i]->punteggio;
-                ordinaTabellonePunteggi();
+            //here
+            if(valutaPunteggio(listaGiocatori[i])) {
+                printf("Nuovo Record!");
             }
 
             mostraPunteggio(listaGiocatori[i]);

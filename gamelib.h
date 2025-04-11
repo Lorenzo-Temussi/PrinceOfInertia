@@ -8,47 +8,47 @@ typedef struct Punteggio Punteggio;
 //
 // SEZIONE 1 - IMPOSTA
 //
-static void riceviInputStringa(char* buffer, int dimensione);
+////static void riceviInputStringa(char* buffer, int dimensione);
 int riceviInputNumerico(int minimo, int massimo);
 
 void inizializzaSeme();
-static void modificaSemeSelect();
+//static void modificaSemeSelect();
 extern void generaSeed();
-static void selezionaSeed();
+//static void selezionaSeed();
 
-static int getRoomCount();
-static void aggiornaUltimaStanza();
+//static int getRoomCount();
+//static void aggiornaUltimaStanza();
 
 //1 - Crea
-static int selezionaPorta();
-static int selezionaTipoStanza();
-static int selezionaTrabocchetto();
-static int selezionaTesoro();
+//static int selezionaPorta();
+//static int selezionaTipoStanza();
+//static int selezionaTrabocchetto();
+//static int selezionaTesoro();
 
-static Stanza* creaStanza(int tipoStanza, int tipo_trabocchetto, int tipo_tesoro);
-static void connettiStanza(Stanza* stanza, int indicePorta);
-static void spingiStanza(Stanza* stanza);
+//static Stanza* creaStanza(int tipoStanza, int tipo_trabocchetto, int tipo_tesoro);
+//static void connettiStanza(Stanza* stanza, int indicePorta);
+//static void spingiStanza(Stanza* stanza);
 
-static void creaStanzaMain();
+//static void creaStanzaMain();
 
 //2 - Cancella
-static int cancellaStanza();
-static void cancellaStanzaSelect();
+//static int cancellaStanza();
+//static void cancellaStanzaSelect();
 
 //3 - Stampa
-static void stampaTipoStanza(Stanza* stanza);
-static void stampaStanza(Stanza* stanza, int showAll);
-static void stampaStanze();
+//static void stampaTipoStanza(Stanza* stanza);
+//static void stampaStanza(Stanza* stanza, int showAll);
+//static void stampaStanze();
 
 //4 - Genera
-static int generaRandomPorte(int ultimaPorta);
-static int generaRandomStanza();
-static int generaRandomTrabocchetto();
-static int generaRandomTesoro();
-static void generaRandom();
+//static int generaRandomPorte(int ultimaPorta);
+//static int generaRandomStanza();
+//static int generaRandomTrabocchetto();
+//static int generaRandomTesoro();
+//static void generaRandom();
 
 //5 - Chiudi
-static int chiudiMappa();
+//static int chiudiMappa();
 
 // Finale 1
 
@@ -60,34 +60,34 @@ void impostaGioco();
 
 // Inizializzazione
 
-static int inserisciNumeroGiocatori();
-static Giocatore* creaGiocatore();
-static Giocatore* popolaGiocatore(Giocatore* giocatore);
-static void inserisciGiocatore(Giocatore* giocatore);
-static void determinaOrdineTurno();
-static Giocatore* ptrGiocatoreNumero(int indice);
-static int ottieniNumeroGiocatori();
+//static int inserisciNumeroGiocatori();
+//static Giocatore* creaGiocatore();
+//static Giocatore* popolaGiocatore(Giocatore* giocatore);
+//static void inserisciGiocatore(Giocatore* giocatore);
+//static void determinaOrdineTurno();
+//static Giocatore* ptrGiocatoreNumero(int indice);
+//static int ottieniNumeroGiocatori();
 
 // Gioca_Turno
 
-static void avanza(Giocatore* giocatore);
-static void combatti(Giocatore* giocatore, int nemico);
-static void vinciCombattimento(Giocatore* giocatore, int nemico);
-static void muori(Giocatore* giocatore);
-static void scappa(Giocatore* giocatore);
-static void prendiTesoro(Giocatore* giocatore);
-static int cercaPortaSegreta(Giocatore* giocatore);
-static int passaTurno(int nemico);
+//static void avanza(Giocatore* giocatore);
+//static void combatti(Giocatore* giocatore, int nemico);
+//static void vinciCombattimento(Giocatore* giocatore, int nemico);
+//static void muori(Giocatore* giocatore);
+//static void scappa(Giocatore* giocatore);
+//static void prendiTesoro(Giocatore* giocatore);
+//static int cercaPortaSegreta(Giocatore* giocatore);
+//static int passaTurno(int nemico);
 
-static void innescaTrabocchetto(Giocatore* giocatore, Stanza* stanza);
-static int generaRandomNemico();
+//static void innescaTrabocchetto(Giocatore* giocatore, Stanza* stanza);
+//static int generaRandomNemico();
 
 //gameover
-static void mostraPunteggio(Giocatore* giocatore);
-static void pausaEsecuzione();
+//static void mostraPunteggio(Giocatore* giocatore);
+//static void pausaEsecuzione();
 
 // Ipse
-static void giocaTurno(Giocatore* giocatore);
+//static void giocaTurno(Giocatore* giocatore);
 
 // Finale 2
 
