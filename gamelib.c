@@ -1233,6 +1233,11 @@ int* semePtr = &seme;
     
     void gioca() {
 
+        if(getRoomCount() < 15) {
+            printf("Imposta la mappa (15 stanze) prima di iniziare un round!\n");
+            return;
+        }
+
         JaffarSconfitto = 0;
         int numGiocatori = inserisciNumeroGiocatori();  //selezione num. giocatori
         Giocatore* listaGiocatori[numGiocatori];
@@ -1291,8 +1296,6 @@ int* semePtr = &seme;
 
 // #endregion
 
-// #region endgame manager
-
     void pausaEsecuzione() {
         printf("Premi Enter per continuare.\n");
         while(getchar() != '\n');
@@ -1310,7 +1313,8 @@ void crediti() {
     printf("  Una produzione di: Il Tecnotrespolo con Corax Crowe\n"
     "  Lead Designer: Lorenzo Temussi\n  Lead Artist: Lorenzo Temussi\n  Level Designer: Lorenzo Temussi\n"
     "  Ringrazio un collega anonimo per il feedback eccezionale che ha offerto, e Luca, Luca, Antonio"
-    ", Bedetta e Tiziano per aver playtestato questo prodotto quando ancora era tutto tranne che completo.\n"
+    "   , Bedetta e Tiziano per aver playtestato questo prodotto quando ancora era tutto tranne che completo.\n"
+    "  Inoltre, Tommaso, per aver offerto feedback avanzato (insulti) sulla qualità del codice.\n"
     "\n  Liberamente ispirato da uno script di Francesco Santini e da un videogame di Jordan Mechner.\n\n");
 }
 
@@ -1320,23 +1324,3 @@ void terminaGioco() {
 }
 
 
-// external save/load
-
-/*
-void writeToFile(const char *filename, struct Stanza *s) {
-    FILE *file = fopen(filename, "w");
-    if (file == NULL) {
-        perror("Failed to open file for writing");
-        return;
-    }
-    
-    fprintf(file, "%d\n", s->tipoStanza);  
-    fprintf(file, "%d\n", s->tipoTrabocchetto);
-    fprintf(file, "%d\n", s->tipoTesoro);
-    fprintf(file, "%p\n", s->stanzaSx);
-    fprintf(file, "%p\n", s->stanzaDx);
-    fprintf(file, "%p\n", s->stanzaSotto);
-    fprintf(file, "%p\n", s->stanzaSopra);
-
-    fclose(file);
-}*/
