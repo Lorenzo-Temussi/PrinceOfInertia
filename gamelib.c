@@ -6,7 +6,7 @@
 #include <sys/time.h>
 #include <time.h>
 
-//Funzioni Statiche
+// Dichiarazione (tecnicamente anche definizione) Funzioni Statiche
 
 static void pausaEsecuzione();
 static void muori(Giocatore* giocatore);
@@ -117,7 +117,6 @@ int* semePtr = &seme;
     extern void generaSeed() {
         *semePtr = rand() % 1000000;
         srand(*semePtr);
-        printf("seed is now %d", *semePtr);
         return;
     }
 
@@ -132,7 +131,6 @@ int* semePtr = &seme;
 
             *semePtr = input;
             srand(*semePtr);
-            printf("Seme impostato: %d.\n", *semePtr);
             break;
         }
         return;
@@ -148,12 +146,14 @@ int* semePtr = &seme;
                     return;
                 case 1:
                     generaSeed();
+                    printf("Seme attuale: %d\n\n", *semePtr);
                     return;
                 case 2: 
                     selezionaSeed();
+                    printf("Seme attuale: %d\n\n", *semePtr);
                     return;
                 default:
-                    printf("Selezione non valida\n");
+                    printf("Selezione non valida\n\n");
                     break;
             }
         }
@@ -165,7 +165,7 @@ int* semePtr = &seme;
     }
 
     static int generaRandomStanza() {
-        int tipoStanza = rand() % 10; //roll stanza
+        int tipoStanza = rand() % 10;
         return tipoStanza;
     }
 
@@ -205,7 +205,7 @@ int* semePtr = &seme;
         return 0;
     }
 
-    static int getRoomCount() { //COMPLETE - LL
+    static int getRoomCount() { 
         int stanzeTotali = 0;
         Stanza* stanzaCorrente = ptrPrimaStanza;
         while (stanzaCorrente != NULL) {       
@@ -215,22 +215,8 @@ int* semePtr = &seme;
         return stanzeTotali;
     }
 
-    /*static void aggiornaUltimaStanza() { //COMPLETA - LL
-        struct Stanza* stanzaCorrente = ptrPrimaStanza;
-        if (stanzaCorrente == NULL)  {
-            ptrUltimaStanza = NULL;
-            return;
-        }
-
-        while (stanzaCorrente->successiva != NULL) {       
-            stanzaCorrente = stanzaCorrente->successiva;     
-        }
-        
-        ptrUltimaStanza = stanzaCorrente;
-    }*/
-
     static int selezionaPorta() {
-        while(1) { // selezione porta
+        while(1) { 
         
             printf("Da quale porta si accede alla stanza?:\n"
             " 0) DESTRA\n 1) AVANTI\n 2) SINISTRA\n 3) INDIETRO\n");
@@ -239,9 +225,7 @@ int* semePtr = &seme;
 
             
 
-            if (porta != -1) {
-                // do nun
-            } else {
+            if (porta == -1) {
                 printf("Input non valido.\n");
                 continue;
             } 
@@ -279,7 +263,7 @@ int* semePtr = &seme;
 
     static int selezionaTrabocchetto() {
         int trabocchetto = -1;
-        while(1) { // selezione trabocchetto
+        while(1) { 
             printf("Inserisci tipo trabocchetto:\n"
             " 1) PIANOFORTE\n 2) LAME\n 3) BANANA\n 4) BURRONE\n 0) NESSUNO\n");
 
@@ -297,7 +281,7 @@ int* semePtr = &seme;
 
     static int selezionaTesoro() {
         int tesoro = -1;
-        while(1) { // selezione tesoro
+        while(1) { 
             printf("Inserisci tipo tesoro:\n"
             " 1) VELENO\n 2) GUARIGIONE\n 3) AUMENTA_HP\n 4) SPADA_TAGLIENTE\n"
             " 5) SCUDO\n 0) NESSUNO\n");
@@ -436,11 +420,11 @@ int* semePtr = &seme;
     static void stampaStanze() {
         Stanza* stanzaCorrente = ptrPrimaStanza;
         
-        if(!stanzaCorrente) { //caso 0 stanze
-            printf("Nessuna stanza selezionata. Ji Nio.\n");
+        if(!stanzaCorrente) {
+            printf("La mappa corrente non contiene alcuna stanza.\n");
         }
 
-        while (stanzaCorrente != NULL) { //iteratore
+        while (stanzaCorrente != NULL) { 
             stampaStanza(stanzaCorrente, 1);
             stanzaCorrente = stanzaCorrente->successiva;
         }
@@ -503,7 +487,6 @@ int* semePtr = &seme;
 
     static void creaStanzaMain() {
 
-        //DEBUG struct Stanza* porte [4] = {NULL, NULL, NULL, NULL}; 
         
         if (getRoomCount()  >= 15) {
             printf("Numero massimo di stanze raggiunto.\n");
@@ -523,7 +506,6 @@ int* semePtr = &seme;
         Stanza* stanzaCorrente = ptrPrimaStanza;
 
         if (!getRoomCount()) {
-            printf("Non ci sono stanze su questa mappa.\n");
             return 0;
         }
 
@@ -546,7 +528,6 @@ int* semePtr = &seme;
         free (stanzaCorrente->successiva);
         stanzaCorrente->successiva = NULL;
         ptrUltimaStanza = stanzaCorrente;
-        printf("La stanza è stata cancellata con successo!\n");
         return 1;    
     }
 
@@ -588,8 +569,6 @@ int* semePtr = &seme;
 
         int ultimaPorta = rand() %4;
         for (int i = 0; i < 15; i++) {
-                    
-            //DEBUG struct Stanza* porte[4] = {NULL, NULL, NULL, NULL};
 
             int tipoStanza = generaRandomStanza();
 
@@ -627,19 +606,19 @@ int* semePtr = &seme;
                     modificaSemeSelect();
                     break;
                 case 1:
-                    creaStanzaMain(); //DONE 
+                    creaStanzaMain(); 
                     break;
                 case 2: 
-                    cancellaStanzaSelect(); //DONE
+                    cancellaStanzaSelect(); 
                     break;
                 case 3: 
-                    stampaStanze(); //DONEa
+                    stampaStanze(); 
                     break;
                 case 4: 
-                    generaRandom(); //IN PROGRESS
+                    generaRandom();
                     break;
                 case 5:
-                    if (chiudiMappa()) {return;} //DONE
+                    if (chiudiMappa()) {return;}
                     break;
                 default:
                     printf("Input is invalid.\n");
@@ -667,7 +646,6 @@ int* semePtr = &seme;
     }
 
     static Giocatore* creaGiocatore() {
-        //printf("Crea giocatore chiamata\n");
         Giocatore* giocatore = (Giocatore*)malloc(sizeof(Giocatore));
 
 
@@ -744,7 +722,6 @@ int* semePtr = &seme;
             break;
         }         
         
-        //strcpy(giocatore->nome, inputName);  // Copy the string into the allocated memory
         giocatore->posizione = ptrPrimaStanza;
 
         giocatore->attacco = 2;
@@ -1016,9 +993,6 @@ int* semePtr = &seme;
         return;
     }
 
-
-    // stampaStanza definita in precedenza
-
     static void prendiTesoro(Giocatore* giocatore) {
         switch(giocatore->posizione->tipoTesoro) {
             case NESSUN_TESORO: 
@@ -1120,7 +1094,6 @@ int* semePtr = &seme;
                 return -1;
         }
 
-        //TODO this doesnt run for unknown reasons
         Stanza* stanzaSegreta = creaStanzaSegreta();
         Stanza* prev = giocatore->posizione;
 
@@ -1239,12 +1212,12 @@ int* semePtr = &seme;
         }
 
         JaffarSconfitto = 0;
-        int numGiocatori = inserisciNumeroGiocatori();  //selezione num. giocatori
+        int numGiocatori = inserisciNumeroGiocatori();  
         Giocatore* listaGiocatori[numGiocatori];
         int ordineGiocatori[numGiocatori];
         int principeSelezionato = 0;
 
-        for(int i = 0; i < numGiocatori; i++) {     // creazione giocatori
+        for(int i = 0; i < numGiocatori; i++) {     
         listaGiocatori[i] = creaGiocatore();
         if (principeSelezionato) {
             listaGiocatori[i]->classe = DOPPELGANGER;
@@ -1282,7 +1255,6 @@ int* semePtr = &seme;
 
         for (int i = 0; i < numGiocatori; i++) {
 
-            //here
             if(valutaPunteggio(listaGiocatori[i])) {
                 printf("Nuovo Record!");
             }
@@ -1294,7 +1266,6 @@ int* semePtr = &seme;
         return;
     } 
 
-// #endregion
 
     void pausaEsecuzione() {
         printf("Premi Enter per continuare.\n");
@@ -1306,7 +1277,6 @@ int* semePtr = &seme;
         return;
     }
 
-// #endregion
 
 
 void crediti() {
