@@ -80,8 +80,6 @@ int JaffarSconfitto = 0;
 int seme = 0;
 int* semePtr = &seme;
 
-// Le funzioni richiamabili in main.c non devono essere static.
-// Le altre devono essere static (non visibili all'esterno).
 
     static void riceviInputStringa(char* buffer, int dimensione) {
         if (fgets(buffer, dimensione, stdin) && !(strchr(buffer, '\n'))) {
@@ -689,11 +687,11 @@ int* semePtr = &seme;
         return giocatore;
     }
 
-    static Giocatore* popolaGiocatore(Giocatore* giocatore) {
+    static Giocatore* popolaGiocatore(Giocatore* giocatore, int indice) {
         int temp;
 
         while(giocatore->classe == -1) {
-            printf("Seleziona la classe:\n 0) PRINCIPE\n 1) DOPPELGANGER\n");
+            printf("\n\nSeleziona la classe, giocatore %d:\n 0) PRINCIPE\n 1) DOPPELGANGER\n", indice);
             if(scanf("%d", &temp) != 0 && temp >= 0 && temp <= 1) {
                 giocatore->classe = temp;
                 break;
@@ -706,42 +704,47 @@ int* semePtr = &seme;
         
 
         if(giocatore->classe == PRINCIPE) {
-            printf("Selezionato: PRINCIPE\n");
+            printf("\nIl giocatore %d è il PRINCIPE\n", indice);
             giocatore->numEvadiTrabocchetto = 1;
             giocatore->numFuga = 1;
         } else {
-            printf("Selezionato: DOPPELGANGER\n");
+            printf("\nIl giocatore %d è un DOPPELGANGER\n", indice);
         }
 
         
-
         char inputName[100];
-        while(1) {
-            printf("Inserisci nome:\n ");
-
-            //if (fgets(inputName, 99, stdin) != NULL && !strchr(inputName, '\n')) {
-                riceviInputStringa(inputName, 99);
-
-                if (strlen(inputName) > 0 && inputName[strlen(inputName) - 1] == '\n') {
-                    inputName[strlen(inputName) - 1] = '\0';
-                    while (getchar() != '\n');
-                    giocatore->nome = (char*)malloc(strlen(inputName) + 1);
-                    break;
-                } else {
-                printf("Error reading input.\n");
-            }
-        }
-
-            /*if(scanf("%99s", string)) {
-                giocatore->nome = malloc(strlen(string) + 1);
-                break;
-            } else {
-                printf("Input non valido.\n");
-            }
-        }  */
-            
+        printf("Inserisci nome:\n ");
+        while (1) {
+            riceviInputStringa(inputName, 99);
         
-        strcpy(giocatore->nome, inputName);  // Copy the string into the allocated memory
+            size_t len = strlen(inputName);
+        
+            if (len == 0) {
+                printf("L'input non contiene assolutamente nulla(molto strano...)\nInserisci nome valido:\n");
+                continue;
+            }
+        
+            if (inputName[len - 1] == '\n') {
+                inputName[len - 1] = '\0';
+                len--;
+            }
+        
+            if (len == 0) {
+                
+                continue;
+            }
+        
+            giocatore->nome = malloc(len + 1);
+            if (!giocatore->nome) {
+                printf("Errore allocazione memoria.\n");
+                exit(1);
+            }
+        
+            strcpy(giocatore->nome, inputName);
+            break;
+        }         
+        
+        //strcpy(giocatore->nome, inputName);  // Copy the string into the allocated memory
         giocatore->posizione = ptrPrimaStanza;
 
         giocatore->attacco = 2;
@@ -753,7 +756,7 @@ int* semePtr = &seme;
     static void innescaTrabocchetto(Giocatore* giocatore, Stanza* stanza) {
         if ((giocatore->numEvadiTrabocchetto > 0) && (stanza->tipoTrabocchetto > 0)) {
             printf("I sensi di persiano di %s lo avvisano che il pericolo è imminente!\n"
-            "Con un salto, una schivata e un ruzzolone, %s evade la trappola in questa stanza!",
+            "Con un salto, una schivata e un ruzzolone, %s evade la trappola in questa stanza!\n",
             giocatore->nome, giocatore->nome);
             giocatore->numEvadiTrabocchetto --;
             giocatore->punteggio += 50;
@@ -761,7 +764,7 @@ int* semePtr = &seme;
         }
         switch (stanza->tipoTrabocchetto) {
             case 0:
-                printf("La stanza non contiene trappole, trabocchetti, botole o cazzi analoghi.\n");
+                printf("La stanza non contiene trappole, trabocchetti o tranelli di sorta.\n");
                 break;
             case 1:
                 printf("Un pianoforte cade dall'alto sulla testa di %s, spaccandone varie ossa\nPerde 2 PS.\n", giocatore->nome);
@@ -1244,7 +1247,7 @@ int* semePtr = &seme;
             listaGiocatori[i]->classe = PRINCIPE;
         }
 
-        listaGiocatori[i] = popolaGiocatore(listaGiocatori[i]);
+        listaGiocatori[i] = popolaGiocatore(listaGiocatori[i], i + 1);
         if (listaGiocatori[i]->classe == PRINCIPE) {
             principeSelezionato = 1;
         }
