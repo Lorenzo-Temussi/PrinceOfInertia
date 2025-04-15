@@ -6,24 +6,25 @@ typedef struct Punteggio Punteggio;
 
 int riceviInputNumerico(int minimo, int massimo);
 
-void inizializzaSeme();
-extern void generaSeed();
+void inizializzaSeme(void);
+extern void generaSeed(void);
 
-void impostaGioco();
+void impostaGioco(void);
 
-void gioca();
+void gioca(void);
 
-void inizializzaTabellonePunteggi();
-void stampaTabellonePunteggi();
+void inizializzaTabellonePunteggi(void);
+void stampaTabellonePunteggi(void);
 
-void crediti();
+void crediti(void);
 
-void terminaGioco();
+void terminaGioco(void);
 
 
 enum tipo_giocatore {
     PRINCIPE,
     DOPPELGANGER,
+    NON_ASSEGNATA
 };
 
 enum tipo_stanza {
