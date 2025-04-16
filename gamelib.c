@@ -592,6 +592,10 @@ static Stanza *creaStanza(int tipoStanza, int tipoTrabocchetto, int tipoTesoro)
 {
     Stanza *temp = (Stanza *)malloc(sizeof(Stanza));
 
+    if(temp == NULL) {
+        return NULL;
+    }
+
     temp->porte[0] = NULL;
     temp->porte[1] = NULL;
     temp->porte[2] = NULL;
@@ -605,10 +609,10 @@ static Stanza *creaStanza(int tipoStanza, int tipoTrabocchetto, int tipoTesoro)
 
     char *stringa[10];
 
-    for (int i = 0; i < 4; i++)
+    /*for (int i = 0; i < 4; i++)
     {
-        temp->direzionePorte[0] = malloc(sizeof(stringa));
-    }
+        temp->direzionePorte[i] = malloc(sizeof(stringa));
+    }*/
 
     temp->direzionePorte[0] = "DESTRA";
     temp->direzionePorte[1] = "AVANTI";
@@ -658,7 +662,11 @@ static void creaStanzaMain()
         return;
     }
 
-    Stanza *nuovaStanza = creaStanza(selezionaTipoStanza(), selezionaTrabocchetto(), selezionaTesoro());
+    Stanza *nuovaStanza = NULL;
+
+    while (nuovaStanza == NULL) {
+        nuovaStanza = creaStanza(selezionaTipoStanza(), selezionaTrabocchetto(), selezionaTesoro());
+    } 
 
     connettiStanza(nuovaStanza, selezionaPorta());
     spingiStanza(nuovaStanza);
@@ -678,6 +686,9 @@ static int cancellaStanza()
 
     if (stanzaCorrente == ptrUltimaStanza)
     {
+        for (int i = 0; i < 4; i++) {
+            free(stanzaCorrente->direzionePorte[i]);
+        }
         free(stanzaCorrente);
         ptrPrimaStanza = NULL;
         ptrUltimaStanza = NULL;
@@ -839,6 +850,10 @@ static int inserisciNumeroGiocatori()
 static Giocatore *creaGiocatore()
 {
     Giocatore *giocatore = (Giocatore *)malloc(sizeof(Giocatore));
+
+    if (giocatore == NULL) {
+        return NULL;
+    }
 
     giocatore->attacco = 1;
     giocatore->classe = NON_ASSEGNATA;
@@ -1066,7 +1081,12 @@ static int infliggiDanni(int attacco, int difesa)
 
 static Nemico *inizializzaNemico(int indice)
 {
-    Nemico *temp = (Nemico *)malloc(sizeof(Nemico));
+    Nemico *temp = NULL;
+    temp = (Nemico *)malloc(sizeof(Nemico));
+    
+    if (temp == NULL) {
+        return NULL;
+    }
 
     switch (indice)
     {
@@ -1094,9 +1114,10 @@ static Nemico *inizializzaNemico(int indice)
         break;
     default:
         printf("In questa stanza sembra non esserci nessuno\n");
+        free(temp);
         return NULL;
     }
-    return temp;
+    return temp; //ERROR TODO?
 }
 
 static void vinciCombattimento(Giocatore *giocatore, int nemico)
@@ -1137,8 +1158,14 @@ static void muori(Giocatore *giocatore)
 static void combatti(Giocatore *giocatore, int indiceNemico)
 {
     printf("Inzia la battaglia!\n");
+
     Nemico *nemico = inizializzaNemico(indiceNemico);
-    while (giocatore->saluteCorrente > 0)
+    if (nemico == NULL) {
+        printf("Invalid selection of Enemy //TODO\n");
+        return;
+    }
+
+    while (1)
     {
         if (rand() % 2)
         {
@@ -1365,6 +1392,8 @@ static int cercaPortaSegreta(Giocatore *giocatore)
 
     giocatore->posizione = prev;
     giocatore->posizione->porteSegrete[scan] = 1;
+
+    free(stanzaSegreta);
     return scan;
 }
 
@@ -1504,7 +1533,11 @@ void gioca()
 
     for (int i = 0; i < numGiocatori; i++)
     {
-        listaGiocatori[i] = creaGiocatore();
+        Giocatore* temp = NULL;
+        while (temp == NULL) {
+            temp = creaGiocatore();
+        }
+        listaGiocatori[i] = temp;
         if (principeSelezionato)
         {
             listaGiocatori[i]->classe = DOPPELGANGER;
