@@ -7,7 +7,6 @@
 
 int main(void)
 {
-
     inizializzaSeme();
     inizializzaTabellonePunteggi();
 
@@ -21,22 +20,21 @@ int main(void)
         switch (state)
         {
         case 1:
-            impostaGioco(); // COMPLETA!
+            impostaGioco(); 
             break;
         case 2:
-            gioca(); // WIP
+            gioca(); 
             break;
         case 3:
-            terminaGioco(); // COMPLETA
+            terminaGioco(); 
             break;
         case 4:
-            crediti(); // WIP
+            crediti(); 
             stampaTabellonePunteggi();
             break;
         default:
             printf("Input is invalid.\n");
-            while (getchar() != '\n')
-                ;
+            while (getchar() != '\n');
             break;
         }
     } while (1);

@@ -607,13 +607,6 @@ static Stanza *creaStanza(int tipoStanza, int tipoTrabocchetto, int tipoTesoro)
     temp->porteSegrete[2] = 0;
     temp->porteSegrete[3] = 0;
 
-    char *stringa[10];
-
-    /*for (int i = 0; i < 4; i++)
-    {
-        temp->direzionePorte[i] = malloc(sizeof(stringa));
-    }*/
-
     temp->direzionePorte[0] = "DESTRA";
     temp->direzionePorte[1] = "AVANTI";
     temp->direzionePorte[2] = "SINISTRA";
@@ -1117,7 +1110,7 @@ static Nemico *inizializzaNemico(int indice)
         free(temp);
         return NULL;
     }
-    return temp; //ERROR TODO?
+    return temp; 
 }
 
 static void vinciCombattimento(Giocatore *giocatore, int nemico)
@@ -1161,7 +1154,7 @@ static void combatti(Giocatore *giocatore, int indiceNemico)
 
     Nemico *nemico = inizializzaNemico(indiceNemico);
     if (nemico == NULL) {
-        printf("Invalid selection of Enemy //TODO\n");
+        printf("Inizializzazione dei nemici fallita!\n");
         return;
     }
 
@@ -1224,7 +1217,7 @@ static void combatti(Giocatore *giocatore, int indiceNemico)
     }
 }
 
-// fine blocco
+// fine blocco Combatti
 
 static void scappa(Giocatore *giocatore)
 {
